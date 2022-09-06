@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.16)
+
+file(GLOB sources ${CMAKE_CURRENT_SOURCE_DIR}/gameng/*.cpp)
+file(GLOB includes ${CMAKE_CURRENT_SOURCE_DIR}/gameng/*.cpp)
+list(APPEND includes ${CMAKE_CURRENT_SOURCE_DIR}/gameng.hpp)
+message(STATUS "collected source are ${sources}")
+message(STATUS "collected includes are ${includes}")
+set(GAMENG_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "some docs")
+message(STATUS "--------GAMENG variables------")
+message(STATUS "GAMENG_INCLUDE_DIR is:${GAMENG_INCLUDE_DIR}")
+add_library(gameng STATIC ${sources})
+target_sources(gameng PUBLIC ${includes})
