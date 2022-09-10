@@ -1,7 +1,7 @@
 #include "applicaiton.hpp"
 #include "application_event.hpp"
 #include "log.hpp"
-
+#include "GLFW/glfw3.h"
 namespace gameng
 {
 
@@ -22,6 +22,8 @@ void Application::Run()
   
   while(m_running)
   {
+    glClearColor(1,0,1,1);
+    glClear(GL_COLOR_BUFFER_BIT);
     m_window->OnUpdate(); 
   }
 }
