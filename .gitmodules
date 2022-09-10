@@ -1,3 +1,6 @@
 [submodule "ext/spdlog"]
 	path = ext/spdlog
 	url = git@github.com:gabime/spdlog.git
+[submodule "ext/glfw"]
+	path = ext/glfw
+	url = git@github.com:glfw/glfw.git
