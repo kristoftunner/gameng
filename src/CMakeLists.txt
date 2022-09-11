@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 
+# get the dependecies
+find_package(OpenGL REQUIRED) # this is required to link because glfw uses it
+
 # get the sources
 file(GLOB sources ${CMAKE_CURRENT_SOURCE_DIR}/gameng/*.cpp)
 file(GLOB includes ${CMAKE_CURRENT_SOURCE_DIR}/gameng/*.hpp)
@@ -23,7 +26,8 @@ add_library(gameng STATIC "")
 target_sources(gameng PUBLIC ${sources})
 target_sources(gameng PUBLIC ${includes})
 
-target_link_libraries(gameng PUBLIC spdlog::spdlog glfw)
+target_link_libraries(gameng PUBLIC spdlog::spdlog glfw ${OPENGL_LIBRARIES})
+
 target_include_directories(gameng 
   PUBLIC 
   ${PROJECT_SOURCE_DIR}/ext/spdlog/include
