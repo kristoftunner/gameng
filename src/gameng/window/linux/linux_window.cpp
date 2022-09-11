@@ -1,4 +1,7 @@
 #include "linux_window.hpp"
+#include "../../mouse_event.hpp"
+#include "../../application_event.hpp"
+#include "../../key_event.hpp"
 #include "../../log.hpp"
 
 namespace gameng
@@ -19,6 +22,10 @@ namespace gameng
   {
     Shutdown();
   }
+  void GLFWErrorCallback(int error_code, const char* description)
+  {
+    GAMENG_CLIENT_ERR("GLFW error:({0}) description:{1}", error_code, description);
+  }
 
   void LinuxWindow::Init(const WindowProps& props)
   {
@@ -32,6 +39,7 @@ namespace gameng
       int success = glfwInit();
       if(success != 0)
         GAMENG_CORE_ERR("Could not initialize GLFW");
+      glfwSetErrorCallback(GLFWErrorCallback);
       s_GLFWInitialized = true;
     }
 
@@ -39,6 +47,85 @@ namespace gameng
     glfwMakeContextCurrent(m_window);
     glfwSetWindowUserPointer(m_window, &m_data);
     SetVSync(true);
+
+    // set glfw callbacks
+    glfwSetWindowSizeCallback(m_window, [](GLFWwindow* window, int width, int heigth)
+    {
+      WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+      data.heigth = heigth;
+      data.width = width;
+      
+      WindowResizeEvent event(width, heigth);
+      data.eventCallback(event);
+    });
+
+    glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window)
+    {
+      WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+      WindowCloseEvent event;
+      data.eventCallback(event); 
+    });
+
+    glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+    {
+      WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+      switch(action)
+      {
+        case GLFW_PRESS:
+        {
+          KeyPressedEvent event(key, 0);
+          data.eventCallback(event);
+          break;
+        }
+        case GLFW_RELEASE:
+        {
+          KeyReleasedEvent event(key);
+          data.eventCallback(event);
+          break;
+        }
+        case GLFW_REPEAT:
+        {
+          KeyPressedEvent event(key, 1);
+          data.eventCallback(event);
+          break;
+        }
+      }
+    });
+
+    glfwSetMouseButtonCallback(m_window, [](GLFWwindow* window, int button, int action, int mods)
+    {
+      WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+      switch(action)
+      {
+        case GLFW_PRESS:
+        {
+          MouseButtonPressedEvent event(button);
+          data.eventCallback(event);
+          break;
+        }
+        case GLFW_RELEASE:
+        {
+          MouseButtonReleasedEvent event(button);
+          data.eventCallback(event);
+          break;
+        }
+      }
+    });
+
+    glfwSetScrollCallback(m_window, [](GLFWwindow* window, double xOffset, double yOffset)
+    {
+      WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+      MouseScrolledEvent event((float)xOffset, (float)yOffset);
+      data.eventCallback(event);
+    });
+
+    glfwSetCursorPosCallback(m_window, [](GLFWwindow* window, double xPos, double yPos)
+    {
+      WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+      MouseMovedEvent event((float)xPos, (float)yPos);
+      data.eventCallback(event);
+    });
   }
 
   void LinuxWindow::Shutdown()

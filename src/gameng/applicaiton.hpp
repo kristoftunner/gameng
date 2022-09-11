@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include "window/window.hpp"
+#include "application_event.hpp"
 
 namespace gameng {
 
@@ -9,7 +10,9 @@ public:
   Application();
   ~Application();
   void Run();
+  void OnEvent(Event& e);
 private:
+  bool OnWindowClosed(WindowCloseEvent& e);
   std::unique_ptr<Window> m_window;
   bool m_running = true;
 };
