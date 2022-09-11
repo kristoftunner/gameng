@@ -36,7 +36,7 @@ void Application::OnEvent(Event& e)
   EventDispatcher dispatcher(e);
   dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClosed));
 
-  for(auto it = m_layerStack.begin(); it != m_layerStack.end();)
+  for(auto it = m_layerStack.end(); it != m_layerStack.begin();)
   {
     (*--it)->OnEvent(e);
     if(e.Handled())

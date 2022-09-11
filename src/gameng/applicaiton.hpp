@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include "window/window.hpp"
+#include "window.hpp"
 #include "application_event.hpp"
 #include "layer.hpp"
 #include "layerstack.hpp"

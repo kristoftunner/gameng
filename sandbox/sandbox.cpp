@@ -10,11 +10,10 @@ public:
 
   void OnUpdate() override
   {
-    GAMENG_CORE_INFO("Example layer update");
   }
 
   void OnEvent(gameng::Event& event) override{
-    GAMENG_CORE_INFO("{0}", event);
+    GAMENG_CORE_INFO("example layer: {0}", event);
   }
 };
 class Sandbox : public gameng::Application{

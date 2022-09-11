@@ -40,7 +40,7 @@ namespace gameng
     if(!s_GLFWInitialized)
     {
       int success = glfwInit();
-      if(success != 1)
+      if(success != GLFW_TRUE)
         GAMENG_CORE_ERR("Could not initialize GLFW");
       glfwSetErrorCallback(GLFWErrorCallback);
       s_GLFWInitialized = true;
@@ -48,7 +48,9 @@ namespace gameng
 
     m_window = glfwCreateWindow((int)props.width, (int)props.heigth, m_data.title.c_str(), nullptr, nullptr);
     glfwMakeContextCurrent(m_window);
-    //int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+    int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+    if(status == 0)
+      GAMENG_CORE_ERR("Could not load GL with GLAD");
 
     glfwSetWindowUserPointer(m_window, &m_data);
     SetVSync(true);

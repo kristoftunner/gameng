@@ -1,6 +1,6 @@
 #pragma once
 #include <functional>
-#include "../event.hpp"
+#include "event.hpp"
 namespace gameng{
 
 struct WindowProps{
