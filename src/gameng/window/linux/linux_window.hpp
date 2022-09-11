@@ -1,6 +1,8 @@
 #pragma once
 #include "../window.hpp"
-#include "GLFW/glfw3.h"
+
+struct GLFWwindow;
+
 namespace gameng
 {
 

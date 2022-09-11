@@ -6,3 +6,5 @@ elseif(UNIX)
 endif()
 
 message(STATUS "GAMENG_PLATFORM:${GAMENG_PLATFORM}")
+
+add_compile_options(-ggdb)

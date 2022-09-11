@@ -4,6 +4,9 @@
 #include "../../key_event.hpp"
 #include "../../log.hpp"
 
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
+
 namespace gameng
 {
   static bool s_GLFWInitialized = false;
@@ -37,7 +40,7 @@ namespace gameng
     if(!s_GLFWInitialized)
     {
       int success = glfwInit();
-      if(success != 0)
+      if(success != 1)
         GAMENG_CORE_ERR("Could not initialize GLFW");
       glfwSetErrorCallback(GLFWErrorCallback);
       s_GLFWInitialized = true;
@@ -45,6 +48,8 @@ namespace gameng
 
     m_window = glfwCreateWindow((int)props.width, (int)props.heigth, m_data.title.c_str(), nullptr, nullptr);
     glfwMakeContextCurrent(m_window);
+    //int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+
     glfwSetWindowUserPointer(m_window, &m_data);
     SetVSync(true);
 

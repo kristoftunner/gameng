@@ -1,7 +1,11 @@
+
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
+
 #include "applicaiton.hpp"
 #include "application_event.hpp"
 #include "log.hpp"
-#include "GLFW/glfw3.h"
+
 namespace gameng
 {
 
