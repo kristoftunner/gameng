@@ -17,10 +17,28 @@ Application::~Application()
 
 }
 
+void Application::PushLayer(Layer* layer)
+{
+  m_layerStack.PushLayer(layer);
+}
+
+void Application::PushOverlay(Layer* layer)
+{
+  m_layerStack.PushOverlay(layer);
+}
+
 void Application::OnEvent(Event& e)
 {
   EventDispatcher dispatcher(e);
   dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClosed));
+
+  for(auto it = m_layerStack.begin(); it != m_layerStack.end();)
+  {
+    (*--it)->OnEvent(e);
+    if(e.Handled())
+      break;
+  }
+
   GAMENG_CORE_INFO("{0}",e);
 }
 
@@ -39,6 +57,10 @@ void Application::Run()
   {
     glClearColor(1,0,1,1);
     glClear(GL_COLOR_BUFFER_BIT);
+    for(Layer* layer : m_layerStack)
+    {
+      layer->OnUpdate();
+    }
     m_window->OnUpdate(); 
   }
 }

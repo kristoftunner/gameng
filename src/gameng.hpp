@@ -2,3 +2,5 @@
 #include "gameng/core.hpp"
 #include "gameng/entrypoint.hpp"
 #include "gameng/log.hpp"
+#include "gameng/event.hpp"
+#include "gameng/layer.hpp"
