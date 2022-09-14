@@ -1,6 +1,4 @@
 #include "gameng.hpp"
-
-#include "gameng.hpp"
 #include <iostream>
 
 class ExampleLayer : public gameng::Layer
@@ -21,6 +19,7 @@ public:
   Sandbox()
   {
     PushLayer(new ExampleLayer());
+    PushOverlay(new gameng::ImguiLayer());
   }
   ~Sandbox(){}
 };

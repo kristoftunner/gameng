@@ -10,10 +10,12 @@
 namespace gameng
 {
   static bool s_GLFWInitialized = false;
-
+  
   Window* Window::Create(const WindowProps& props)
   {
-    return new LinuxWindow(props);
+    Window* window = new LinuxWindow(props);
+    GAMENG_CORE_INFO("h:w - {0}:{1}", window->GetWindowHeigth(), window->GetWindowWidth());
+    return window;
   }
 
   LinuxWindow::LinuxWindow(const WindowProps& props)

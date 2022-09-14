@@ -8,10 +8,17 @@
 
 namespace gameng
 {
-
 #define BIND_EVENT_FN(func) std::bind(&func, this, std::placeholders::_1)
+
+Application* Application::s_instance = nullptr;
+
 Application::Application()
 {
+  if(s_instance == nullptr)
+    s_instance = this;
+  else 
+    GAMENG_CORE_ERR("Multiple Application instances!");
+  //m_window = std::make_unique<Window>(Window::Create());
   m_window = std::unique_ptr<Window>(Window::Create());
   m_window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
 }
@@ -24,11 +31,13 @@ Application::~Application()
 void Application::PushLayer(Layer* layer)
 {
   m_layerStack.PushLayer(layer);
+  layer->OnAttach();
 }
 
 void Application::PushOverlay(Layer* layer)
 {
   m_layerStack.PushOverlay(layer);
+  layer->OnAttach();
 }
 
 void Application::OnEvent(Event& e)

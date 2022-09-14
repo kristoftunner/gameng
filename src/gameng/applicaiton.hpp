@@ -6,6 +6,7 @@
 #include "layerstack.hpp"
 namespace gameng {
 
+
 class Application{
 public:
   Application();
@@ -14,11 +15,14 @@ public:
   void OnEvent(Event& e);
   void PushLayer(Layer* layer);
   void PushOverlay(Layer* layer);
+  static inline Application& GetInstance() { return *s_instance; }
+  inline Window& GetWindow(){ return *m_window; }
 private:
   bool OnWindowClosed(WindowCloseEvent& e);
   std::unique_ptr<Window> m_window;
   bool m_running = true;
   LayerStack m_layerStack;
+  static Application* s_instance;
 };
 
 /**
