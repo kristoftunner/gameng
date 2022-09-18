@@ -3,6 +3,11 @@
 #include "applicaiton.hpp"
 #include "platform/opengl/imgui_opengl_renderer.hpp"
 #include "imgui.h"
+#include "core.hpp"
+#include "application_event.hpp"
+#include "mouse_event.hpp"
+#include "key_event.hpp"
+#include "event.hpp"
 #include "GLFW/glfw3.h"
 
 namespace gameng
@@ -169,7 +174,60 @@ static ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int key)
 
   void ImguiLayer::OnEvent(Event& event)
   {
-
+    EventDispatcher dispatcher(event);
+    dispatcher.Dispatch<MouseButtonPressedEvent>(GAMENG_BIND_FN(ImguiLayer::OnMouseButtonPressedEvent));
+    dispatcher.Dispatch<MouseButtonReleasedEvent>(GAMENG_BIND_FN(ImguiLayer::OnMouseButtonReleasedEvent));
+    dispatcher.Dispatch<MouseMovedEvent>(GAMENG_BIND_FN(ImguiLayer::OnMouseMovedEvent));
+    dispatcher.Dispatch<MouseScrolledEvent>(GAMENG_BIND_FN(ImguiLayer::OnMouseScrolledEvent));
+    dispatcher.Dispatch<KeyPressedEvent>(GAMENG_BIND_FN(ImguiLayer::OnKeyPressedEvent));
+    dispatcher.Dispatch<KeyReleasedEvent>(GAMENG_BIND_FN(ImguiLayer::OnKeyReleasedEvent));
+    dispatcher.Dispatch<WindowResizeEvent>(GAMENG_BIND_FN(ImguiLayer::OnWindowResizedEvent));
   } 
+  bool ImguiLayer::OnMouseButtonPressedEvent(MouseButtonPressedEvent& event)
+  {
+    auto button = event.GetButtonCode();
+    ImGuiIO& io = ImGui::GetIO();
+    if (button >= 0 && button < ImGuiMouseButton_COUNT)
+      io.AddMouseButtonEvent(event.GetButtonCode(), GLFW_PRESS);
+    return false;
+  }
+
+  bool ImguiLayer::OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& event)
+  {
+    auto button = event.GetButtonCode();
+    ImGuiIO& io = ImGui::GetIO();
+    if (button >= 0 && button < ImGuiMouseButton_COUNT)
+      io.AddMouseButtonEvent(event.GetButtonCode(), GLFW_RELEASE);
+    return false;
+  }
+
+  bool ImguiLayer::OnMouseMovedEvent(MouseMovedEvent& event)
+  {
+    ImGuiIO& io = ImGui::GetIO();
+    io.AddMousePosEvent(event.GetX(), event.GetY());
+  }
+
+  bool ImguiLayer::OnMouseScrolledEvent(MouseScrolledEvent& event)
+  {
+    ImGuiIO& io = ImGui::GetIO();
+    io.AddMouseWheelEvent(event.GetXOffset(), event.GetYOffset());
+
+  }
+
+  bool ImguiLayer::OnKeyPressedEvent(KeyPressedEvent& event)
+  {
+
+  }
+
+  bool ImguiLayer::OnKeyReleasedEvent(KeyReleasedEvent& event)
+  {
+
+  }
+
+  //bool ImguiLayer::OnKeyTypedEvent(KeyTypedEvent& event);
+  bool ImguiLayer::OnWindowResizedEvent(WindowResizeEvent& event)
+  {
+
+  }
   
 } // namespace gameng
