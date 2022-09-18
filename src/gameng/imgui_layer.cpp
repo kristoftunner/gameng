@@ -2,11 +2,14 @@
 #include "imgui_layer.hpp"
 #include "applicaiton.hpp"
 #include "platform/opengl/imgui_opengl_renderer.hpp"
+#include "mouse_event.hpp"
+#include "event.hpp"
 #include "imgui.h"
 #include "GLFW/glfw3.h"
 
 namespace gameng
 {
+#define BIND_EVENT_FN(func) std::bind(&func, this, std::placeholders::_1)
 static ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int key)
 {
     switch (key)
@@ -169,7 +172,39 @@ static ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int key)
 
   void ImguiLayer::OnEvent(Event& event)
   {
-
+    EventDispatcher dispatcher(event);
+    dispatcher.Dispatch<MouseMovedEvent>(BIND_EVENT_FN(ImguiLayer::OnMouseMovedEvent));
   } 
   
+  bool ImguiLayer::OnKeyPressed()
+  {
+
+  }
+
+  bool ImguiLayer::OnKeyReleased()
+  {
+
+  }
+
+  bool ImguiLayer::OnMouseButtonPressed()
+  {
+
+  }
+
+  bool ImguiLayer::OnMouseButtonReleased()
+  {
+
+  }
+
+  bool ImguiLayer::OnMouseScrollEvent()
+  {
+
+  }
+
+  bool ImguiLayer::OnMouseMovedEvent(MouseMovedEvent& event)
+  {
+    ImGuiIO& io = ImGui::GetIO();
+    io.AddMousePosEvent((float)event.GetX(), (float)event.GetY());
+  }
+
 } // namespace gameng
