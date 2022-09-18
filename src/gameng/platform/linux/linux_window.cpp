@@ -1,8 +1,8 @@
-#include "linux_window.hpp"
-#include "../../mouse_event.hpp"
-#include "../../application_event.hpp"
-#include "../../key_event.hpp"
-#include "../../log.hpp"
+#include "gameng/platform/linux/linux_window.hpp"
+#include "gameng/mouse_event.hpp"
+#include "gameng/application_event.hpp"
+#include "gameng/key_event.hpp"
+#include "gameng/log.hpp"
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"

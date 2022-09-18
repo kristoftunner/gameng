@@ -1,7 +1,7 @@
 #pragma once
 
-#include "applicaiton.hpp"
-#include "log.hpp"
+#include "gameng/applicaiton.hpp"
+#include "gameng/log.hpp"
 
 extern gameng::Application* gameng::CreateApplication();
 

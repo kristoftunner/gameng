@@ -1,6 +1,6 @@
 #include <algorithm>
 
-#include "layerstack.hpp"
+#include "gameng/layerstack.hpp"
 
 namespace gameng
 {

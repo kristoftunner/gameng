@@ -1,4 +1,5 @@
-#include "log.hpp"
+#include "gameng/log.hpp"
+
 #include "spdlog/sinks/stdout_color_sinks.h"
 
 namespace gameng

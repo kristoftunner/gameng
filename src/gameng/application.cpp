@@ -2,9 +2,9 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
-#include "applicaiton.hpp"
-#include "application_event.hpp"
-#include "log.hpp"
+#include "gameng/applicaiton.hpp"
+#include "gameng/application_event.hpp"
+#include "gameng/log.hpp"
 
 namespace gameng
 {

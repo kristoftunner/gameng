@@ -1,6 +1,6 @@
 #pragma once
 
-#include "event.hpp"
+#include "gameng/event.hpp"
 #include <sstream>
 namespace gameng
 {

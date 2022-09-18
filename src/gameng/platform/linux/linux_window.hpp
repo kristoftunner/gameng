@@ -1,5 +1,6 @@
 #pragma once
-#include "../../window.hpp"
+
+#include "gameng/window.hpp"
 
 struct GLFWwindow;
 

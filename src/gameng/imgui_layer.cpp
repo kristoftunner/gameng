@@ -1,14 +1,10 @@
 
-#include "imgui_layer.hpp"
-#include "applicaiton.hpp"
-#include "platform/opengl/imgui_opengl_renderer.hpp"
-#include "imgui.h"
-#include "core.hpp"
-#include "application_event.hpp"
-#include "mouse_event.hpp"
-#include "key_event.hpp"
-#include "event.hpp"
+#include "gameng/imgui_layer.hpp"
+#include "gameng/applicaiton.hpp"
+#include "gameng/platform/opengl/imgui_opengl_renderer.hpp"
+#include "gameng/core.hpp"
 
+#include "imgui.h"
 #include <glad/glad.h>
 #include "GLFW/glfw3.h"
 

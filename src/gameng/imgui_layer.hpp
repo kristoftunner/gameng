@@ -1,9 +1,9 @@
 #pragma once
 
-#include "layer.hpp"
-#include "application_event.hpp"
-#include "mouse_event.hpp"
-#include "key_event.hpp"
+#include "gameng/layer.hpp"
+#include "gameng/application_event.hpp"
+#include "gameng/mouse_event.hpp"
+#include "gameng/key_event.hpp"
 
 namespace gameng
 {

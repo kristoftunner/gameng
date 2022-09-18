@@ -1,9 +1,9 @@
 #pragma once
 #include <memory>
-#include "window.hpp"
-#include "application_event.hpp"
-#include "layer.hpp"
-#include "layerstack.hpp"
+#include "gameng/window.hpp"
+#include "gameng/application_event.hpp"
+#include "gameng/layer.hpp"
+#include "gameng/layerstack.hpp"
 namespace gameng {
 
 
