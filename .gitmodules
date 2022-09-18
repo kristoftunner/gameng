@@ -7,3 +7,6 @@
 [submodule "ext/imgui"]
 	path = ext/imgui
 	url = git@github.com:kristoftunner/imgui.git
+[submodule "ext/glm"]
+	path = ext/glm
+	url = git@github.com:g-truc/glm.git

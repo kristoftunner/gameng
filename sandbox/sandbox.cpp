@@ -4,10 +4,14 @@
 class ExampleLayer : public gameng::Layer
 {
 public:
-  ExampleLayer() : Layer("Example"){}
+  ExampleLayer() : Layer("Example")
+  {
+  }
 
   void OnUpdate() override
   {
+    if(gameng::Input::IsKeyPressed(GAMENG_KEY_TAB))
+      GAMENG_CORE_INFO("TAB key is pressed");
   }
 
   void OnEvent(gameng::Event& event) override{

@@ -35,7 +35,7 @@ add_library(gameng STATIC "")
 target_sources(gameng PUBLIC ${sources})
 target_sources(gameng PUBLIC ${includes})
 
-target_link_libraries(gameng PUBLIC spdlog::spdlog glfw ${OPENGL_LIBRARIES} glad dl imgui)
+target_link_libraries(gameng PUBLIC spdlog::spdlog glfw ${OPENGL_LIBRARIES} glad dl imgui glm)
 
 target_include_directories(gameng 
   PUBLIC 

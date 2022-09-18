@@ -5,3 +5,6 @@
 #include "gameng/event.hpp"
 #include "gameng/layer.hpp"
 #include "gameng/imgui_layer.hpp"
+#include "gameng/keycodes.hpp"
+#include "gameng/mousebutton_codes.hpp"
+#include "gameng/input.hpp"
