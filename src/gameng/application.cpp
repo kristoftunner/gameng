@@ -5,6 +5,7 @@
 #include "gameng/applicaiton.hpp"
 #include "gameng/application_event.hpp"
 #include "gameng/log.hpp"
+#include "gameng/input.hpp"
 
 namespace gameng
 {
@@ -73,6 +74,10 @@ void Application::Run()
     {
       layer->OnUpdate();
     }
+
+    auto[x,y] = Input::GetMousePosition();
+    GAMENG_CORE_TRACE("{0} {1}",x,y);
+
     m_window->OnUpdate(); 
   }
 }
