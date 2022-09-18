@@ -3,9 +3,10 @@
 #include "gameng/applicaiton.hpp"
 #include "gameng/platform/opengl/imgui_opengl_renderer.hpp"
 #include "gameng/core.hpp"
+#include "gameng/mouse_event.hpp"
+#include "gameng/event.hpp"
+#include "gameng/log.hpp"
 
-#include "mouse_event.hpp"
-#include "event.hpp"
 #include "imgui.h"
 #include <glad/glad.h>
 #include "GLFW/glfw3.h"
@@ -143,8 +144,6 @@ static ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int key)
     ImGuiIO& io = ImGui::GetIO();
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
-    //ImGuiKey imgui_key = ImGui_ImplGlfw_KeyToImGuiKey(keycode);
-    //io.AddKeyEvent(imgui_key, (action == GLFW_PRESS));
     ImGui_ImplOpenGL3_Init("#version 410");
   }
 
@@ -187,36 +186,30 @@ static ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int key)
   } 
   bool ImguiLayer::OnMouseButtonPressedEvent(MouseButtonPressedEvent& event)
   {
-    auto button = event.GetButtonCode();
     ImGuiIO& io = ImGui::GetIO();
-    if (button >= 0 && button < ImGuiMouseButton_COUNT)
-      io.AddMouseButtonEvent(event.GetButtonCode(), true);
+    io.MouseDown[event.GetButtonCode()] = true;
     return false;
   }
 
   bool ImguiLayer::OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& event)
   {
-    auto button = event.GetButtonCode();
     ImGuiIO& io = ImGui::GetIO();
-    if (button >= 0 && button < ImGuiMouseButton_COUNT)
-      io.AddMouseButtonEvent(event.GetButtonCode(), false);
-
+    io.MouseDown[event.GetButtonCode()] = false;
     return false;
   }
 
   bool ImguiLayer::OnMouseMovedEvent(MouseMovedEvent& event)
   {
     ImGuiIO& io = ImGui::GetIO();
-    io.AddMousePosEvent(event.GetX(), event.GetY());
-
+    io.MousePos = ImVec2(event.GetX(), event.GetY());
     return false;
   }
 
   bool ImguiLayer::OnMouseScrolledEvent(MouseScrolledEvent& event)
   {
     ImGuiIO& io = ImGui::GetIO();
-    io.AddMouseWheelEvent(event.GetXOffset(), event.GetYOffset());
-  
+    io.MouseWheelH += event.GetXOffset();
+    io.MouseWheel += event.GetYOffset();
     return false;
   }
 
@@ -224,8 +217,6 @@ static ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int key)
   {
     ImGuiIO& io = ImGui::GetIO();
     ImGuiKey imgui_key = ImGui_ImplGlfw_KeyToImGuiKey(event.GetKeycode());
-    io.AddKeyEvent(imgui_key, true);
-  
     return false;
   }
 
@@ -234,9 +225,7 @@ static ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int key)
     ImGuiIO& io = ImGui::GetIO();
     ImGuiKey imgui_key = ImGui_ImplGlfw_KeyToImGuiKey(event.GetKeycode());
     io.AddKeyEvent(imgui_key, false);
-  
     return false;
-
   }
 
   bool ImguiLayer::OnKeyTypedEvent(KeyTypedEvent& event)
