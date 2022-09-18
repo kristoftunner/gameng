@@ -4,32 +4,21 @@ cmake_minimum_required(VERSION 3.16)
 find_package(OpenGL REQUIRED) # this is required to link because glfw uses it
 # get the sources
 file(GLOB sources ${CMAKE_CURRENT_SOURCE_DIR}/gameng/*.cpp)
-#file(GLOB includes ${CMAKE_CURRENT_SOURCE_DIR}/gameng/*.hpp)
-#list(APPEND includes ${CMAKE_CURRENT_SOURCE_DIR}/gameng.hpp)
 set(GAMENG_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "some docs")
 
 # get the window sources
 file(GLOB src ${CMAKE_CURRENT_SOURCE_DIR}/gameng/platform/${GAMENG_PLATFORM}/*.cpp)
-#file(GLOB inc ${CMAKE_CURRENT_SOURCE_DIR}/gameng/platform/${GAMENG_PLATFORM}/*.hpp)
 list(APPEND sources ${src})
-#list(APPEND includes ${inc})
 
 # get imgui sources
-file(GLOB src ${CMAKE_CURRENT_SOURCE_DIR}/gameng/platform/opengl/*.cpp)
-#file(GLOB inc ${CMAKE_CURRENT_SOURCE_DIR}/gameng/platform/opengl/*.hpp)
+file(GLOB src ${CMAKE_CURRENT_SOURCE_DIR}/gameng/imgui/*.cpp)
 list(APPEND sources ${src})
-#list(APPEND includes ${inc})
 
 # debug messages
-#message(STATUS "--------GAMENG variables------")
-#message(STATUS "GAMENG_INCLUDE_DIR is:${GAMENG_INCLUDE_DIR}")
 message(STATUS "----------- collected sources ----------")
 foreach(src ${sources})
   message(STATUS "${src}")
 endforeach()
-#foreach(inc ${includes})
-#  message(STATUS "${inc}")
-#endforeach()
 
 add_library(gameng STATIC "")
 target_sources(gameng PUBLIC ${sources})

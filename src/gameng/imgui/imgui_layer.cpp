@@ -1,13 +1,14 @@
 
-#include "gameng/imgui_layer.hpp"
+#include "gameng/imgui/imgui_layer.hpp"
 #include "gameng/applicaiton.hpp"
-#include "gameng/platform/opengl/imgui_opengl_renderer.hpp"
 #include "gameng/core.hpp"
 #include "gameng/mouse_event.hpp"
 #include "gameng/event.hpp"
 #include "gameng/log.hpp"
 
 #include "imgui.h"
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
 #include <glad/glad.h>
 #include "GLFW/glfw3.h"
 
@@ -138,6 +139,15 @@ static ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int key)
 
   void ImguiLayer::OnAttach()
   {
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+    //io.ConfigViewportsNoAutoMerge = true;
+    //io.ConfigViewportsNoTaskBarIcon = true;
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
 
@@ -171,82 +181,5 @@ static ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int key)
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
   } 
-
-  void ImguiLayer::OnEvent(Event& event)
-  {
-    EventDispatcher dispatcher(event);
-    dispatcher.Dispatch<MouseButtonPressedEvent>(GAMENG_BIND_FN(ImguiLayer::OnMouseButtonPressedEvent));
-    dispatcher.Dispatch<MouseButtonReleasedEvent>(GAMENG_BIND_FN(ImguiLayer::OnMouseButtonReleasedEvent));
-    dispatcher.Dispatch<MouseMovedEvent>(GAMENG_BIND_FN(ImguiLayer::OnMouseMovedEvent));
-    dispatcher.Dispatch<MouseScrolledEvent>(GAMENG_BIND_FN(ImguiLayer::OnMouseScrolledEvent));
-    dispatcher.Dispatch<KeyPressedEvent>(GAMENG_BIND_FN(ImguiLayer::OnKeyPressedEvent));
-    dispatcher.Dispatch<KeyReleasedEvent>(GAMENG_BIND_FN(ImguiLayer::OnKeyReleasedEvent));
-    dispatcher.Dispatch<KeyTypedEvent>(GAMENG_BIND_FN(ImguiLayer::OnKeyTypedEvent));
-    dispatcher.Dispatch<WindowResizeEvent>(GAMENG_BIND_FN(ImguiLayer::OnWindowResizedEvent));
-  } 
-  bool ImguiLayer::OnMouseButtonPressedEvent(MouseButtonPressedEvent& event)
-  {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseDown[event.GetButtonCode()] = true;
-    return false;
-  }
-
-  bool ImguiLayer::OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& event)
-  {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseDown[event.GetButtonCode()] = false;
-    return false;
-  }
-
-  bool ImguiLayer::OnMouseMovedEvent(MouseMovedEvent& event)
-  {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MousePos = ImVec2(event.GetX(), event.GetY());
-    return false;
-  }
-
-  bool ImguiLayer::OnMouseScrolledEvent(MouseScrolledEvent& event)
-  {
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseWheelH += event.GetXOffset();
-    io.MouseWheel += event.GetYOffset();
-    return false;
-  }
-
-  bool ImguiLayer::OnKeyPressedEvent(KeyPressedEvent& event)
-  {
-    ImGuiIO& io = ImGui::GetIO();
-    ImGuiKey imgui_key = ImGui_ImplGlfw_KeyToImGuiKey(event.GetKeycode());
-    return false;
-  }
-
-  bool ImguiLayer::OnKeyReleasedEvent(KeyReleasedEvent& event)
-  {
-    ImGuiIO& io = ImGui::GetIO();
-    ImGuiKey imgui_key = ImGui_ImplGlfw_KeyToImGuiKey(event.GetKeycode());
-    io.AddKeyEvent(imgui_key, false);
-    return false;
-  }
-
-  bool ImguiLayer::OnKeyTypedEvent(KeyTypedEvent& event)
-  {
-    ImGuiIO& io = ImGui::GetIO();
-    unsigned int keycode = event.GetKeycode();
-    if(keycode > 0 && keycode < 0x10000)
-      io.AddInputCharacter(keycode);
-
-    return false;
-  }
-
-  bool ImguiLayer::OnWindowResizedEvent(WindowResizeEvent& event)
-  {
-    ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize = ImVec2(event.GetWidth(), event.GetHeigth());
-    io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
-    glViewport(0,0,event.GetWidth(), event.GetHeigth());
-
-    return false;
-  }
-  
 
 } // namespace gameng
