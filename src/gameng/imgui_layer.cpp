@@ -8,6 +8,8 @@
 #include "mouse_event.hpp"
 #include "key_event.hpp"
 #include "event.hpp"
+
+#include <glad/glad.h>
 #include "GLFW/glfw3.h"
 
 namespace gameng
@@ -181,6 +183,7 @@ static ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int key)
     dispatcher.Dispatch<MouseScrolledEvent>(GAMENG_BIND_FN(ImguiLayer::OnMouseScrolledEvent));
     dispatcher.Dispatch<KeyPressedEvent>(GAMENG_BIND_FN(ImguiLayer::OnKeyPressedEvent));
     dispatcher.Dispatch<KeyReleasedEvent>(GAMENG_BIND_FN(ImguiLayer::OnKeyReleasedEvent));
+    dispatcher.Dispatch<KeyTypedEvent>(GAMENG_BIND_FN(ImguiLayer::OnKeyTypedEvent));
     dispatcher.Dispatch<WindowResizeEvent>(GAMENG_BIND_FN(ImguiLayer::OnWindowResizedEvent));
   } 
   bool ImguiLayer::OnMouseButtonPressedEvent(MouseButtonPressedEvent& event)
@@ -188,7 +191,7 @@ static ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int key)
     auto button = event.GetButtonCode();
     ImGuiIO& io = ImGui::GetIO();
     if (button >= 0 && button < ImGuiMouseButton_COUNT)
-      io.AddMouseButtonEvent(event.GetButtonCode(), GLFW_PRESS);
+      io.AddMouseButtonEvent(event.GetButtonCode(), true);
     return false;
   }
 
@@ -197,7 +200,8 @@ static ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int key)
     auto button = event.GetButtonCode();
     ImGuiIO& io = ImGui::GetIO();
     if (button >= 0 && button < ImGuiMouseButton_COUNT)
-      io.AddMouseButtonEvent(event.GetButtonCode(), GLFW_RELEASE);
+      io.AddMouseButtonEvent(event.GetButtonCode(), false);
+
     return false;
   }
 
@@ -205,29 +209,55 @@ static ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int key)
   {
     ImGuiIO& io = ImGui::GetIO();
     io.AddMousePosEvent(event.GetX(), event.GetY());
+
+    return false;
   }
 
   bool ImguiLayer::OnMouseScrolledEvent(MouseScrolledEvent& event)
   {
     ImGuiIO& io = ImGui::GetIO();
     io.AddMouseWheelEvent(event.GetXOffset(), event.GetYOffset());
-
+  
+    return false;
   }
 
   bool ImguiLayer::OnKeyPressedEvent(KeyPressedEvent& event)
   {
-
+    ImGuiIO& io = ImGui::GetIO();
+    ImGuiKey imgui_key = ImGui_ImplGlfw_KeyToImGuiKey(event.GetKeycode());
+    io.AddKeyEvent(imgui_key, true);
+  
+    return false;
   }
 
   bool ImguiLayer::OnKeyReleasedEvent(KeyReleasedEvent& event)
   {
+    ImGuiIO& io = ImGui::GetIO();
+    ImGuiKey imgui_key = ImGui_ImplGlfw_KeyToImGuiKey(event.GetKeycode());
+    io.AddKeyEvent(imgui_key, false);
+  
+    return false;
 
   }
 
-  //bool ImguiLayer::OnKeyTypedEvent(KeyTypedEvent& event);
+  bool ImguiLayer::OnKeyTypedEvent(KeyTypedEvent& event)
+  {
+    ImGuiIO& io = ImGui::GetIO();
+    unsigned int keycode = event.GetKeycode();
+    if(keycode > 0 && keycode < 0x10000)
+      io.AddInputCharacter(keycode);
+
+    return false;
+  }
+
   bool ImguiLayer::OnWindowResizedEvent(WindowResizeEvent& event)
   {
+    ImGuiIO& io = ImGui::GetIO();
+    io.DisplaySize = ImVec2(event.GetWidth(), event.GetHeigth());
+    io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
+    glViewport(0,0,event.GetWidth(), event.GetHeigth());
 
+    return false;
   }
   
 } // namespace gameng

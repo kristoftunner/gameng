@@ -44,4 +44,19 @@ public:
     return ss.str();
   }
 };
+
+class KeyTypedEvent : public KeyEvent
+{
+public:
+  KeyTypedEvent(int keycode) : KeyEvent(keycode)  {}
+  EVENT_CLASS_TYPE(KeyTyped)
+  std::string ToString() const override
+  {
+    std::stringstream ss;
+    ss << "KeyTypedEvent: keycode:" << m_keycode;
+    return ss.str();
+  }
+private:
+  int m_repeateCount;
+};
 } // namespace gameng

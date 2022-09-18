@@ -135,6 +135,13 @@ namespace gameng
       MouseMovedEvent event((float)xPos, (float)yPos);
       data.eventCallback(event);
     });
+
+    glfwSetCharCallback(m_window, [](GLFWwindow* window, unsigned int c)
+    {
+      WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+      KeyTypedEvent event(c);
+      data.eventCallback(event);
+    });  
   }
 
   void LinuxWindow::Shutdown()
