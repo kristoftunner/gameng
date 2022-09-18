@@ -75,11 +75,11 @@ class MouseButtonReleasedEvent : public MouseButtonEvent
 {
 public:
   MouseButtonReleasedEvent(int buttonCode) : MouseButtonEvent(buttonCode) {}
-  EVENT_CLASS_TYPE(MouseButtonPressed)
+  EVENT_CLASS_TYPE(MouseButtonReleased)
   std::string ToString() const override
   {
     std::stringstream ss;
-    ss << "MouseButtonPressedEvent: buttonCode:" << m_buttonCode;
+    ss << "MouseButtonReleasedEvent: buttonCode:" << m_buttonCode;
     return ss.str();
   }
 };

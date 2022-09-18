@@ -7,4 +7,4 @@ endif()
 
 message(STATUS "GAMENG_PLATFORM:${GAMENG_PLATFORM}")
 
-add_compile_options(-ggdb)
+add_compile_options(-Ofast)

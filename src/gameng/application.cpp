@@ -18,7 +18,6 @@ Application::Application()
     s_instance = this;
   else 
     GAMENG_CORE_ERR("Multiple Application instances!");
-  //m_window = std::make_unique<Window>(Window::Create());
   m_window = std::unique_ptr<Window>(Window::Create());
   m_window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
 }
