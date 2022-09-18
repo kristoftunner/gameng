@@ -4,12 +4,15 @@
 #include "gameng/platform/opengl/imgui_opengl_renderer.hpp"
 #include "gameng/core.hpp"
 
+#include "mouse_event.hpp"
+#include "event.hpp"
 #include "imgui.h"
 #include <glad/glad.h>
 #include "GLFW/glfw3.h"
 
 namespace gameng
 {
+#define BIND_EVENT_FN(func) std::bind(&func, this, std::placeholders::_1)
 static ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int key)
 {
     switch (key)
@@ -173,6 +176,7 @@ static ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int key)
   void ImguiLayer::OnEvent(Event& event)
   {
     EventDispatcher dispatcher(event);
+<<<<<<< HEAD
     dispatcher.Dispatch<MouseButtonPressedEvent>(GAMENG_BIND_FN(ImguiLayer::OnMouseButtonPressedEvent));
     dispatcher.Dispatch<MouseButtonReleasedEvent>(GAMENG_BIND_FN(ImguiLayer::OnMouseButtonReleasedEvent));
     dispatcher.Dispatch<MouseMovedEvent>(GAMENG_BIND_FN(ImguiLayer::OnMouseMovedEvent));
@@ -181,6 +185,9 @@ static ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int key)
     dispatcher.Dispatch<KeyReleasedEvent>(GAMENG_BIND_FN(ImguiLayer::OnKeyReleasedEvent));
     dispatcher.Dispatch<KeyTypedEvent>(GAMENG_BIND_FN(ImguiLayer::OnKeyTypedEvent));
     dispatcher.Dispatch<WindowResizeEvent>(GAMENG_BIND_FN(ImguiLayer::OnWindowResizedEvent));
+=======
+    dispatcher.Dispatch<MouseMovedEvent>(BIND_EVENT_FN(ImguiLayer::OnMouseMovedEvent));
+>>>>>>> dev
   } 
   bool ImguiLayer::OnMouseButtonPressedEvent(MouseButtonPressedEvent& event)
   {
@@ -256,4 +263,35 @@ static ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int key)
     return false;
   }
   
+  bool ImguiLayer::OnKeyPressed()
+  {
+
+  }
+
+  bool ImguiLayer::OnKeyReleased()
+  {
+
+  }
+
+  bool ImguiLayer::OnMouseButtonPressed()
+  {
+
+  }
+
+  bool ImguiLayer::OnMouseButtonReleased()
+  {
+
+  }
+
+  bool ImguiLayer::OnMouseScrollEvent()
+  {
+
+  }
+
+  bool ImguiLayer::OnMouseMovedEvent(MouseMovedEvent& event)
+  {
+    ImGuiIO& io = ImGui::GetIO();
+    io.AddMousePosEvent((float)event.GetX(), (float)event.GetY());
+  }
+
 } // namespace gameng
