@@ -21,6 +21,8 @@ Application::Application()
     GAMENG_CORE_ERR("Multiple Application instances!");
   m_window = std::unique_ptr<Window>(Window::Create());
   m_window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
+  m_imguiLayer = new ImguiLayer();
+  PushOverlay(m_imguiLayer);
 }
 
 Application::~Application()
@@ -75,8 +77,12 @@ void Application::Run()
       layer->OnUpdate();
     }
 
-    //auto[x,y] = Input::GetMousePosition();
-    //GAMENG_CORE_TRACE("{0} {1}",x,y);
+    m_imguiLayer->Begin();
+    for(Layer* layer : m_layerStack)
+    {
+      layer->OnImguiRender();
+    }
+    m_imguiLayer->End();
 
     m_window->OnUpdate(); 
   }

@@ -10,6 +10,10 @@ set(GAMENG_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "some docs")
 file(GLOB src ${CMAKE_CURRENT_SOURCE_DIR}/gameng/platform/${GAMENG_PLATFORM}/*.cpp)
 list(APPEND sources ${src})
 
+# get the opengl sources
+file(GLOB src ${CMAKE_CURRENT_SOURCE_DIR}/gameng/platform/opengl/*.cpp)
+list(APPEND sources ${src})
+
 # get imgui sources
 file(GLOB src ${CMAKE_CURRENT_SOURCE_DIR}/gameng/imgui/*.cpp)
 list(APPEND sources ${src})

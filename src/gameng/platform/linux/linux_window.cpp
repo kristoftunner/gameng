@@ -3,8 +3,8 @@
 #include "gameng/application_event.hpp"
 #include "gameng/key_event.hpp"
 #include "gameng/log.hpp"
+#include "gameng/platform/opengl/opengl_context.hpp"
 
-#include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
 namespace gameng
@@ -49,10 +49,10 @@ namespace gameng
     }
 
     m_window = glfwCreateWindow((int)props.width, (int)props.heigth, m_data.title.c_str(), nullptr, nullptr);
-    glfwMakeContextCurrent(m_window);
-    int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-    if(status == 0)
-      GAMENG_CORE_ERR("Could not load GL with GLAD");
+    
+    m_context = new OpenglContext(m_window);
+    m_context->Init();
+    
 
     glfwSetWindowUserPointer(m_window, &m_data);
     SetVSync(true);
@@ -152,7 +152,7 @@ namespace gameng
   void LinuxWindow::OnUpdate()
   {
     glfwPollEvents();
-    glfwSwapBuffers(m_window);
+    m_context->SwapBuffers();
   }
 
   void LinuxWindow::SetVSync(bool enabled)

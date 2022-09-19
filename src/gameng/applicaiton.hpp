@@ -3,6 +3,7 @@
 #include "gameng/window.hpp"
 #include "gameng/application_event.hpp"
 #include "gameng/layer.hpp"
+#include "gameng/imgui/imgui_layer.hpp"
 #include "gameng/layerstack.hpp"
 namespace gameng {
 
@@ -20,6 +21,7 @@ public:
 private:
   bool OnWindowClosed(WindowCloseEvent& e);
   std::unique_ptr<Window> m_window;
+  ImguiLayer* m_imguiLayer;
   bool m_running = true;
   LayerStack m_layerStack;
   static Application* s_instance;

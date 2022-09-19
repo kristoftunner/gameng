@@ -15,7 +15,9 @@ public:
   ~ImguiLayer();
   virtual void OnAttach() override;
   virtual void OnDetach() override;
-  virtual void OnUpdate() override;
+  virtual void OnImguiRender() override;
+  void Begin();
+  void End();
 private:
   float m_time = 0.0f;
 };

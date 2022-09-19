@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gameng/window.hpp"
+#include "gameng/renderer/graphic_context.hpp"
 
 struct GLFWwindow;
 
@@ -25,6 +26,7 @@ private:
   virtual void Shutdown();
 private:
   GLFWwindow* m_window;
+  GraphicsContext* m_context;
 
   struct WindowData
   {
