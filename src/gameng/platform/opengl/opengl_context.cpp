@@ -19,6 +19,9 @@ namespace gameng
     if(status == 0)
       GAMENG_CORE_ERR("Could not load GL with GLAD");
 
+    GAMENG_CORE_INFO("OpenGL vendor: {0}",glGetString(GL_VENDOR));
+    GAMENG_CORE_INFO("OpenGL renderer: {0}",glGetString(GL_RENDERER));
+    GAMENG_CORE_INFO("OpenGL version: {0}",glGetString(GL_VERSION));
   } 
 
   void OpenglContext::SwapBuffers()
