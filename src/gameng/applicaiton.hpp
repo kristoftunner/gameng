@@ -5,9 +5,8 @@
 #include "gameng/layer.hpp"
 #include "gameng/imgui/imgui_layer.hpp"
 #include "gameng/layerstack.hpp"
+#include "gameng/renderer/shader.hpp" 
 namespace gameng {
-
-
 class Application{
 public:
   Application();
@@ -26,6 +25,7 @@ private:
   LayerStack m_layerStack;
   static Application* s_instance;
   unsigned int m_vertexArray, m_vertexBuffer, m_indexBuffer;
+  std::unique_ptr<Shader> m_shader;
 };
 
 /**

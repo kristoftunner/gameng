@@ -6,7 +6,6 @@
 #include "gameng/application_event.hpp"
 #include "gameng/log.hpp"
 #include "gameng/input.hpp"
-
 namespace gameng
 {
 #define BIND_EVENT_FN(func) std::bind(&func, this, std::placeholders::_1)
@@ -39,6 +38,9 @@ Application::Application()
     0.0f, 0.5f, 0.0f
   };
 
+  VertexBuffer buffer = VertexBuffer::Create(sizeof(vertices), vertices);
+  buffer.bind();
+  
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), nullptr);
@@ -48,6 +50,34 @@ Application::Application()
 
   unsigned int indices[3] = {0,1,2};
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices, GL_STATIC_DRAW);
+
+  std::string vertexSrc = R"(
+    #version 330 core
+    
+    layout(location=0) in vec3 a_position;
+
+    out vec3 v_position;
+
+    void main()
+    {
+      v_position = a_position;
+      gl_Position = vec4(a_position, 1.0);
+    }
+  )";
+
+  std::string fragmentSource = R"(
+    #version 330 core
+    
+    layout(location=0) out vec4 color;
+
+    int vec3 v_position;
+
+    void main()
+    {
+      color = vec4(v_position * 0.5 + 0.5, 1.0);
+    }
+  )";
+  m_shader.reset(new Shader(vertexSrc, fragmentSource));
 }
 
 Application::~Application()
@@ -97,6 +127,8 @@ void Application::Run()
   {
     glClearColor(0.1f,0.1f,0.1f,1);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    m_shader->Bind();
 
     glBindVertexArray(m_vertexArray);
     glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
