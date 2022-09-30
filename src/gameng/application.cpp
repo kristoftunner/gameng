@@ -1,11 +1,11 @@
 
-#include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
 #include "gameng/applicaiton.hpp"
 #include "gameng/application_event.hpp"
 #include "gameng/log.hpp"
 #include "gameng/input.hpp"
+#include "gameng/renderer/renderer.hpp"
 namespace gameng
 {
 #define BIND_EVENT_FN(func) std::bind(&func, this, std::placeholders::_1)
@@ -170,16 +170,19 @@ void Application::Run()
   
   while(m_running)
   {
-    glClearColor(0.1f,0.1f,0.1f,1);
-    glClear(GL_COLOR_BUFFER_BIT);
+    
+    RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1});
+    RenderCommand::Clear();
+    
+    Renderer::BeginScene();
     
     m_blueShader->Bind();
-    m_squareVA->Bind();
-    glDrawElements(GL_TRIANGLES, m_squareVA->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
-
+    Renderer::Submit(m_squareVA);  
     m_shader->Bind();
-    m_vertexArray->Bind();
-    glDrawElements(GL_TRIANGLES, m_vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+    Renderer::Submit(m_vertexArray);  
+    
+    Renderer::EndScene();
+
     for(Layer* layer : m_layerStack)
     {
       layer->OnUpdate();

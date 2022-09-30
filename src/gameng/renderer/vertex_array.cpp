@@ -8,8 +8,8 @@ namespace gameng
   {
     switch(Renderer::GetAPI())
     {
-      case RendererAPI::None: GAMENG_CORE_ERR("Renderer API is not supported"); return nullptr;
-      case RendererAPI::OpenGL: return new OpenGLVertexArray();
+      case RendererAPI::API::None: GAMENG_CORE_ERR("Renderer API is not supported"); return nullptr;
+      case RendererAPI::API::OpenGL: return new OpenGLVertexArray();
       default: GAMENG_CORE_ERR("Unknown renderer API"); return nullptr;
     }
     return nullptr;

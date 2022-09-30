@@ -9,8 +9,8 @@ namespace gameng
   {
     switch(Renderer::GetAPI())
     {
-      case RendererAPI::None: GAMENG_CORE_ERR("Renderer API is not supported"); return nullptr;
-      case RendererAPI::OpenGL: return new OpenGLVertexBuffer(vertices, size);
+      case RendererAPI::API::None: GAMENG_CORE_ERR("Renderer API is not supported"); return nullptr;
+      case RendererAPI::API::OpenGL: return new OpenGLVertexBuffer(vertices, size);
       default: GAMENG_CORE_ERR("Unknown renderer API"); return nullptr;
     }
     return nullptr;
@@ -20,8 +20,8 @@ namespace gameng
   {
     switch(Renderer::GetAPI())
     {
-      case RendererAPI::None: GAMENG_CORE_ERR("Renderer API is not supported"); return nullptr;
-      case RendererAPI::OpenGL: return new OpenGLIndexBuffer(indices, size);
+      case RendererAPI::API::None: GAMENG_CORE_ERR("Renderer API is not supported"); return nullptr;
+      case RendererAPI::API::OpenGL: return new OpenGLIndexBuffer(indices, size);
       default: GAMENG_CORE_ERR("Unknown renderer API"); return nullptr;
     }
     return nullptr;

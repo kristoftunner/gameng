@@ -1,19 +1,20 @@
 #pragma once
 
+#include <memory>
+
+#include "gameng/renderer/render_command.hpp"
+
 namespace gameng
 {
-
-enum class RendererAPI
-{
-  None = 0, OpenGL = 1,
-};
 
 class Renderer
 {
 public:
-  inline static RendererAPI GetAPI(){return s_rendererAPI;}
+  static void BeginScene();
+  static void EndScene();
+  static void Submit(const std::shared_ptr<VertexArray>& vertexArray);
+  inline static RendererAPI::API GetAPI(){return RendererAPI::GetAPI();}
 private:
-  static RendererAPI s_rendererAPI;
 };
 
 } // namespace gameng
