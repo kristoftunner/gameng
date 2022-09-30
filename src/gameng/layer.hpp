@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "gameng/event.hpp"
+#include "gameng/core/timestep.hpp"
 
 namespace gameng
 {
@@ -12,7 +13,7 @@ public:
 
   virtual void OnAttach() {}
   virtual void OnDetach() {}
-  virtual void OnUpdate() {}
+  virtual void OnUpdate(Timestep ts) {}
   virtual void OnEvent(Event& event) {}
   virtual void OnImguiRender(){}
 

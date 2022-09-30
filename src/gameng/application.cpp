@@ -6,6 +6,8 @@
 #include "gameng/log.hpp"
 #include "gameng/input.hpp"
 #include "gameng/renderer/renderer.hpp"
+#include "gameng/core/timestep.hpp"
+
 namespace gameng
 {
 #define BIND_EVENT_FN(func) std::bind(&func, this, std::placeholders::_1)
@@ -70,10 +72,12 @@ void Application::Run()
   
   while(m_running)
   {
-    
+    float time = static_cast<float>(glfwGetTime()); // TODO REFACTOR: Platform::GetTime()
+    Timestep timestep = time - m_lastFrameTime; 
+    m_lastFrameTime = time;   
     for(Layer* layer : m_layerStack)
     {
-      layer->OnUpdate();
+      layer->OnUpdate(timestep);
     }
 
     m_imguiLayer->Begin();

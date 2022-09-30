@@ -116,32 +116,33 @@ public:
     m_blueShader.reset(new gameng::Shader(vertexSrc2, fragmentSource2));
   }
 
-  void OnUpdate() override
+  void OnUpdate(gameng::Timestep ts) override
   {
+    GAMENG_CORE_TRACE("timestep:{}", ts);
     if(gameng::Input::IsKeyPressed(GAMENG_KEY_LEFT))
     {
-      m_cameraPosition.x += m_cameraMoveSpeed;
+      m_cameraPosition.x += m_cameraMoveSpeed * ts;
     } 
     else if(gameng::Input::IsKeyPressed(GAMENG_KEY_RIGHT))
     {
-      m_cameraPosition.x -= m_cameraMoveSpeed;
+      m_cameraPosition.x -= m_cameraMoveSpeed * ts;
     } 
     else if(gameng::Input::IsKeyPressed(GAMENG_KEY_UP))
     {
-      m_cameraPosition.y -= m_cameraMoveSpeed;
+      m_cameraPosition.y -= m_cameraMoveSpeed* ts;
     } 
     else if(gameng::Input::IsKeyPressed(GAMENG_KEY_DOWN))
     {
-      m_cameraPosition.y += m_cameraMoveSpeed;
+      m_cameraPosition.y += m_cameraMoveSpeed* ts;
     }
     
     if(gameng::Input::IsKeyPressed(GAMENG_KEY_A))
     {
-      m_cameraRotation += m_cameraRotationSpeed;
+      m_cameraRotation += m_cameraRotationSpeed* ts;
     } 
     else if(gameng::Input::IsKeyPressed(GAMENG_KEY_D))
     {
-      m_cameraRotation -= m_cameraRotationSpeed;
+      m_cameraRotation -= m_cameraRotationSpeed* ts;
     } 
 
     m_camera.SetPosition(m_cameraPosition);
@@ -169,9 +170,9 @@ private:
   std::shared_ptr<gameng::VertexArray> m_squareVA;
   gameng::OrtographicCamera m_camera;
   glm::vec3 m_cameraPosition;
-  float m_cameraMoveSpeed = 0.1f;
+  float m_cameraMoveSpeed = 5.0f;
   float m_cameraRotation = 0.0f;
-  float m_cameraRotationSpeed = 1.0f;
+  float m_cameraRotationSpeed = 180.0f;
 };
 class Sandbox : public gameng::Application{
 public:

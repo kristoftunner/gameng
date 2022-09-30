@@ -18,3 +18,6 @@
 #include "gameng/renderer/shader.hpp"
 
 #include "gameng/renderer/ortographic_camera.hpp"
+
+// core
+#include "gameng/core/timestep.hpp"
