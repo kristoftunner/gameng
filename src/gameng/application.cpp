@@ -6,6 +6,8 @@
 #include "gameng/application_event.hpp"
 #include "gameng/log.hpp"
 #include "gameng/input.hpp"
+#include "gameng/renderer/ortographic_camera.hpp"
+
 namespace gameng
 {
 #define BIND_EVENT_FN(func) std::bind(&func, this, std::placeholders::_1)
@@ -13,6 +15,7 @@ namespace gameng
 Application* Application::s_instance = nullptr;
 
 Application::Application()
+  : m_camera(-1.0f, 1.0f, -1.0f, 1.0f)
 {
   if(s_instance == nullptr)
     s_instance = this;
@@ -31,7 +34,8 @@ Application::Application()
     0.0f, 0.5f, 0.0f,1.0f, 0.0f, 0.0f, 1.0f 
   };
 
-  std::shared_ptr<VertexBuffer> vertexBuffer = std::make_shared<VertexBuffer>(VertexBuffer::Create(vertices, sizeof(vertices)));
+  std::shared_ptr<VertexBuffer> vertexBuffer;
+  vertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
   
   BufferLayout layout = {
     {ShaderDataType::Float3, "a_position"},
@@ -42,23 +46,26 @@ Application::Application()
   m_vertexArray->AddVertexBuffer(vertexBuffer);
 
   unsigned int indices[3] = {0,1,2};
-  std::shared_ptr<IndexBuffer> indexBuffer = std::make_shared<IndexBuffer>(IndexBuffer::Create(indices, sizeof(indices ) / sizeof(uint32_t)));
+  std::shared_ptr<IndexBuffer> indexBuffer;
+  indexBuffer.reset(IndexBuffer::Create(indices, sizeof(indices ) / sizeof(uint32_t)));
   m_vertexArray->SetIndexBuffer(indexBuffer);
   m_squareVA.reset(VertexArray::Create());
   
   float squareVertices[3*4] = {
     -0.5f, -0.5f, 0.0f,
     0.5f, -0.5f, 0.0f,  
-    0.5f, 0.5f, 0.0f
+    0.5f, 0.5f, 0.0f,
     -0.5f, 0.5f, 0.0f
   };
-  std::shared_ptr<VertexBuffer> squareVB = std::make_shared<VertexBuffer>(VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
+  std::shared_ptr<VertexBuffer> squareVB;
+  squareVB.reset(VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
   squareVB->SetLayout( {
     {ShaderDataType::Float3, "a_position"},
   });
   m_squareVA->AddVertexBuffer(squareVB);
   unsigned int squareIndices[6] = {0,1,2,2,3,0};
-  std::shared_ptr<IndexBuffer> squareIndexBuffer = std::make_shared<IndexBuffer>(IndexBuffer::Create(squareIndices, sizeof(squareIndices ) / sizeof(uint32_t)));
+  std::shared_ptr<IndexBuffer> squareIndexBuffer;
+  squareIndexBuffer.reset(IndexBuffer::Create(squareIndices, sizeof(squareIndices ) / sizeof(uint32_t)));
   m_squareVA->SetIndexBuffer(squareIndexBuffer);
 
 
@@ -71,11 +78,13 @@ Application::Application()
     out vec3 v_position;
     out vec4 v_color;
 
+    uniform vec4 u_viewProjection;
+
     void main()
     {
       v_position = a_position;
       v_color = a_color;
-      gl_Position = vec4(a_position, 1.0);
+      gl_Position = u_viewProjection * vec4(a_position, 1.0);
     }
   )";
 
@@ -99,13 +108,15 @@ Application::Application()
     
     layout(location=0) in vec3 a_position;
     layout(location=1) in vec4 a_color;
+    
+    uniform vec4 u_viewProjection;
 
     out vec3 v_position;
 
     void main()
     {
       v_position = a_position;
-      gl_Position = vec4(a_position, 1.0);
+      gl_Position = u_viewProjection * vec4(a_position, 1.0);
     }
   )";
 
@@ -174,10 +185,12 @@ void Application::Run()
     glClear(GL_COLOR_BUFFER_BIT);
     
     m_blueShader->Bind();
+    m_blueShader->UploadUniformMat4("u_viewProjection", m_camera.GetViewProjectionMatrix());
     m_squareVA->Bind();
     glDrawElements(GL_TRIANGLES, m_squareVA->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 
     m_shader->Bind();
+    m_blueShader->UploadUniformMat4("u_viewProjection", m_camera.GetViewProjectionMatrix());
     m_vertexArray->Bind();
     glDrawElements(GL_TRIANGLES, m_vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
     for(Layer* layer : m_layerStack)

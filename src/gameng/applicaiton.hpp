@@ -8,6 +8,7 @@
 #include "gameng/renderer/shader.hpp" 
 #include "gameng/renderer/buffer.hpp"
 #include "gameng/renderer/vertex_array.hpp"
+#include "gameng/renderer/ortographic_camera.hpp"
 
 namespace gameng {
 class Application{
@@ -32,6 +33,7 @@ private:
   
   std::shared_ptr<VertexArray> m_vertexArray;
   std::shared_ptr<VertexArray> m_squareVA;
+  OrtographicCamera m_camera;
 };
 
 /**
