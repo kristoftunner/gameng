@@ -11,9 +11,8 @@ public:
   OrtographicCamera(float left, float right, float bottom, float top);
 
   const glm::vec3& GetPosition(){return m_position;}
-  void SetPosition(const glm::vec3& position) { m_position = position; }
-  
-  void SetRotation(const float& rotation) { m_rotation = rotation; }
+  void SetPosition(const glm::vec3& position) { m_position = position; RecalculateViewMatrix();}
+  void SetRotation(const float& rotation) { m_rotation = rotation; RecalculateViewMatrix();}
   const float& GetRotation(){return m_rotation;}
 
   const glm::mat4& GetProjectionMatrix(){return m_projectionMatrix;}
@@ -25,7 +24,7 @@ private:
   glm::mat4 m_projectionMatrix;
   glm::mat4 m_viewMatrix;
   glm::mat4 m_viewProjMatrix; 
-  glm::vec3 m_position;
+  glm::vec3 m_position = {0.0f,0.0f,0.0f};
   float m_rotation = 0.0f;
 };
 
