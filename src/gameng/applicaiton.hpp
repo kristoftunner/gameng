@@ -7,6 +7,7 @@
 #include "gameng/layerstack.hpp"
 #include "gameng/renderer/shader.hpp" 
 #include "gameng/renderer/buffer.hpp"
+#include "gameng/renderer/vertex_array.hpp"
 
 namespace gameng {
 class Application{
@@ -26,10 +27,11 @@ private:
   bool m_running = true;
   LayerStack m_layerStack;
   static Application* s_instance;
-  unsigned int m_vertexArray;
-  std::unique_ptr<Shader> m_shader;
-  std::unique_ptr<VertexBuffer> m_vertexBuffer;
-  std::unique_ptr<IndexBuffer> m_indexBuffer;
+  std::shared_ptr<Shader> m_shader;
+  std::shared_ptr<VertexBuffer> m_vertexBuffer;
+  std::shared_ptr<IndexBuffer> m_indexBuffer;
+  std::shared_ptr<VertexArray> m_vertexArray;
+  
 };
 
 /**
