@@ -24,6 +24,10 @@ namespace gameng
     GAMENG_CORE_ERR("Unknown ShaderDataType");
     return 0;
   }
+  OpenGLVertexArray::~OpenGLVertexArray()
+  {
+    glDeleteVertexArrays(1, &m_rendererId);
+  }
 
   OpenGLVertexArray::OpenGLVertexArray()
   {
