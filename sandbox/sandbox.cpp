@@ -1,6 +1,7 @@
 #include "gameng.hpp"
 #include <iostream>
 #include <memory>
+#include <experimental/filesystem>
 
 #include "imgui.h"
 #include "glm/gtc/matrix_transform.hpp"
@@ -36,16 +37,17 @@ public:
     m_vertexArray->SetIndexBuffer(indexBuffer);
     m_squareVA.reset(gameng::VertexArray::Create());
   
-    float squareVertices[3*4] = {
-      -0.5f, -0.5f, 0.0f,
-      0.5f, -0.5f, 0.0f,  
-      0.5f, 0.5f, 0.0f,
-      -0.5f, 0.5f, 0.0f
+    float squareVertices[5*4] = {
+      -0.5f, -0.5f, 0.0f,0.0f, 0.0f,
+      0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 
+      0.5f, 0.5f, 0.0f,  1.0f, 1.0f, 
+      -0.5f, 0.5f, 0.0f, 0.0f, 1.0f 
     };
     gameng::Ref<gameng::VertexBuffer> squareVB;
     squareVB.reset(gameng::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
     squareVB->SetLayout( {
       {gameng::ShaderDataType::Float3, "a_position"},
+      {gameng::ShaderDataType::Float2, "a_textCoord"},
     });
     m_squareVA->AddVertexBuffer(squareVB);
     unsigned int squareIndices[6] = {0,1,2,2,3,0};
@@ -120,13 +122,50 @@ public:
         color = vec4(u_color, 1.0);
       }
     )";
+    
+    std::string textureShaderVertexSource = R"(
+      #version 330 core
+
+      layout(location=0) in vec3 a_position;
+      layout(location=1) in vec2 a_textCoord;
+
+      uniform mat4 u_viewProjection;
+      uniform mat4 u_transform;
+
+      out vec3 v_position;
+      out vec2 v_textCoord;
+      void main()
+      {
+        v_textCoord = a_textCoord;
+        v_position = a_position;
+        gl_Position = u_viewProjection * u_transform * vec4(a_position, 1.0);
+      }
+    )";
+
+    std::string textureShaderFragmentSource = R"(
+      #version 330 core
+
+      layout(location=0) out vec4 color;
+
+      in vec2 v_textCoord;
+
+      uniform sampler2D u_texture;
+
+      void main()
+      {
+        color = texture(u_texture, v_textCoord);
+      }
+    )";
     m_shader.reset(gameng::Shader::Create(vertexSrc, fragmentSource));
     m_flatColorShader.reset(gameng::Shader::Create(flatColorVertexSource, flatColorFragmentSource));
+    m_textureShader.reset(gameng::Shader::Create(textureShaderVertexSource, textureShaderFragmentSource));
+    m_texture = gameng::Texture2D::Create("../sandbox/assets/textures/Checkerboard.png");
+    std::dynamic_pointer_cast<gameng::OpenGLShader>(m_textureShader)->Bind(); 
+    std::dynamic_pointer_cast<gameng::OpenGLShader>(m_textureShader)->UploadUniformInt("u_texture", 0); 
   }
 
   void OnUpdate(gameng::Timestep ts) override
   {
-    GAMENG_CORE_TRACE("timestep:{}", ts);
     if(gameng::Input::IsKeyPressed(GAMENG_KEY_LEFT))
     {
       m_cameraPosition.x += m_cameraMoveSpeed * ts;
@@ -189,8 +228,10 @@ public:
         gameng::Renderer::Submit(m_flatColorShader, m_squareVA, transform);  
       } 
     }
-    
-    gameng::Renderer::Submit(m_shader, m_vertexArray);  
+
+    m_texture->Bind(0);
+    gameng::Renderer::Submit(m_textureShader, m_squareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.0f)));  
+    //gameng::Renderer::Submit(m_shader, m_vertexArray);  
     
     gameng::Renderer::EndScene();
   }
@@ -207,8 +248,8 @@ public:
 
 private:
   gameng::Ref<gameng::Shader> m_shader;
-  gameng::Ref<gameng::Shader> m_flatColorShader;
-  
+  gameng::Ref<gameng::Shader> m_flatColorShader, m_textureShader;
+  gameng::Ref<gameng::Texture2D> m_texture;
   gameng::Ref<gameng::VertexArray> m_vertexArray;
   gameng::Ref<gameng::VertexArray> m_squareVA;
   gameng::OrtographicCamera m_camera;
