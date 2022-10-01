@@ -201,6 +201,6 @@ static ImGuiKey ImGui_ImplGlfw_KeyToImGuiKey(int key)
   void ImguiLayer::OnImguiRender()
   {
     static bool show = true;
-    ImGui::ShowDemoWindow(&show);
+    //ImGui::ShowDemoWindow(&show);
   }
 } // namespace gameng

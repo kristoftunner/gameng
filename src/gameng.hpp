@@ -16,6 +16,7 @@
 #include "gameng/renderer/buffer.hpp"
 #include "gameng/renderer/vertex_array.hpp"
 #include "gameng/renderer/shader.hpp"
+#include "gameng/platform/opengl/opengl_shader.hpp"
 
 #include "gameng/renderer/ortographic_camera.hpp"
 

@@ -1,4 +1,7 @@
-#include "renderer.hpp"
+#include "gameng/renderer/renderer.hpp"
+#include "gameng/platform/opengl/opengl_shader.hpp"
+
+#include <memory>
 
 namespace gameng
 {
@@ -13,11 +16,11 @@ namespace gameng
   {
   }
 
-  void Renderer::Submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vertexArray)
+  void Renderer::Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transform)
   {
-    shader->Bind();
-    shader->UploadUniformMat4("u_viewProjection", s_sceneData->viewProjectionMatrix);
-
+    std::dynamic_pointer_cast<OpenGLShader>(shader)->Bind();
+    std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_viewProjection", s_sceneData->viewProjectionMatrix);
+    std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4("u_transform", transform); // model matrix of the object/s that are rendered
     vertexArray->Bind();
     RenderCommand::DrawIndexed(vertexArray);
   }

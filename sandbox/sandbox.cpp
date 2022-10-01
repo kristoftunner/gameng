@@ -1,10 +1,15 @@
 #include "gameng.hpp"
 #include <iostream>
+#include <memory>
+
 #include "imgui.h"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
+
 class ExampleLayer : public gameng::Layer
 {
 public:
-  ExampleLayer() : Layer("Example"), m_camera(-1.6f, 1.6f, -0.9f, 0.9f), m_cameraPosition(0.0f)
+  ExampleLayer() : Layer("Example"), m_camera(-1.6f, 1.6f, -0.9f, 0.9f), m_cameraPosition(0.0f), m_squarePosition(0.0f)
   {
     m_vertexArray.reset(gameng::VertexArray::Create());
   
@@ -14,7 +19,7 @@ public:
       0.0f, 0.5f, 0.0f,1.0f, 0.0f, 0.0f, 1.0f 
     };
 
-    std::shared_ptr<gameng::VertexBuffer> vertexBuffer;
+    gameng::Ref<gameng::VertexBuffer> vertexBuffer;
     vertexBuffer.reset(gameng::VertexBuffer::Create(vertices, sizeof(vertices)));
   
     gameng::BufferLayout layout = {
@@ -26,7 +31,7 @@ public:
     m_vertexArray->AddVertexBuffer(vertexBuffer);
 
     unsigned int indices[3] = {0,1,2};
-    std::shared_ptr<gameng::IndexBuffer> indexBuffer;
+    gameng::Ref<gameng::IndexBuffer> indexBuffer;
     indexBuffer.reset(gameng::IndexBuffer::Create(indices, sizeof(indices ) / sizeof(uint32_t)));
     m_vertexArray->SetIndexBuffer(indexBuffer);
     m_squareVA.reset(gameng::VertexArray::Create());
@@ -37,14 +42,14 @@ public:
       0.5f, 0.5f, 0.0f,
       -0.5f, 0.5f, 0.0f
     };
-    std::shared_ptr<gameng::VertexBuffer> squareVB;
+    gameng::Ref<gameng::VertexBuffer> squareVB;
     squareVB.reset(gameng::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
     squareVB->SetLayout( {
       {gameng::ShaderDataType::Float3, "a_position"},
     });
     m_squareVA->AddVertexBuffer(squareVB);
     unsigned int squareIndices[6] = {0,1,2,2,3,0};
-    std::shared_ptr<gameng::IndexBuffer> squareIndexBuffer;
+    gameng::Ref<gameng::IndexBuffer> squareIndexBuffer;
     squareIndexBuffer.reset(gameng::IndexBuffer::Create(squareIndices, sizeof(squareIndices ) / sizeof(uint32_t)));
     m_squareVA->SetIndexBuffer(squareIndexBuffer);
 
@@ -59,12 +64,13 @@ public:
       out vec4 v_color;
 
       uniform mat4 u_viewProjection;
+      uniform mat4 u_transform;
 
       void main()
       {
         v_position = a_position;
         v_color = a_color;
-        gl_Position = u_viewProjection * vec4(a_position, 1.0);
+        gl_Position = u_viewProjection * u_transform * vec4(a_position, 1.0);
       }
     )";
 
@@ -83,37 +89,39 @@ public:
       }
     )";
   
-    std::string vertexSrc2 = R"(
+    std::string flatColorVertexSource = R"(
       #version 330 core
 
       layout(location=0) in vec3 a_position;
       layout(location=1) in vec4 a_color;
 
       uniform mat4 u_viewProjection;
+      uniform mat4 u_transform;
 
       out vec3 v_position;
 
       void main()
       {
         v_position = a_position;
-        gl_Position = u_viewProjection * vec4(a_position, 1.0);
+        gl_Position = u_viewProjection * u_transform * vec4(a_position, 1.0);
       }
     )";
 
-    std::string fragmentSource2 = R"(
+    std::string flatColorFragmentSource = R"(
       #version 330 core
 
       layout(location=0) out vec4 color;
 
       in vec3 v_position;
+      uniform vec3 u_color;
 
       void main()
       {
-        color = vec4(0.2, 0.3, 0.8, 1.0);
+        color = vec4(u_color, 1.0);
       }
     )";
-    m_shader.reset(new gameng::Shader(vertexSrc, fragmentSource));
-    m_blueShader.reset(new gameng::Shader(vertexSrc2, fragmentSource2));
+    m_shader.reset(gameng::Shader::Create(vertexSrc, fragmentSource));
+    m_flatColorShader.reset(gameng::Shader::Create(flatColorVertexSource, flatColorFragmentSource));
   }
 
   void OnUpdate(gameng::Timestep ts) override
@@ -145,14 +153,43 @@ public:
       m_cameraRotation -= m_cameraRotationSpeed* ts;
     } 
 
+    if(gameng::Input::IsKeyPressed(GAMENG_KEY_J))
+    {
+      m_squarePosition.x += m_squareMoveSpeed * ts;
+    } 
+    else if(gameng::Input::IsKeyPressed(GAMENG_KEY_L))
+    {
+      m_squarePosition.x -= m_squareMoveSpeed * ts;
+    } 
+    else if(gameng::Input::IsKeyPressed(GAMENG_KEY_I))
+    {
+      m_squarePosition.y += m_squareMoveSpeed * ts;
+    } 
+    else if(gameng::Input::IsKeyPressed(GAMENG_KEY_K))
+    {
+      m_squarePosition.y -= m_squareMoveSpeed * ts;
+    } 
+
     m_camera.SetPosition(m_cameraPosition);
     gameng::RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1});
     gameng::RenderCommand::Clear();
     m_camera.SetPosition(m_cameraPosition); 
     m_camera.SetRotation(m_cameraRotation);
     gameng::Renderer::BeginScene(m_camera);
+
+    glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
+    std::dynamic_pointer_cast<gameng::OpenGLShader>(m_flatColorShader)->Bind(); 
+    std::dynamic_pointer_cast<gameng::OpenGLShader>(m_flatColorShader)->UploadUniformFloat3("u_color", m_squareColor); 
+    for(int x = 0; x < 20; x++)
+    {
+      for(int y = 0; y < 5; y++)
+      {
+        glm::vec3 position(x * 0.11f, y* 0.11f, 0.0f);
+        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * scale;
+        gameng::Renderer::Submit(m_flatColorShader, m_squareVA, transform);  
+      } 
+    }
     
-    gameng::Renderer::Submit(m_blueShader, m_squareVA);  
     gameng::Renderer::Submit(m_shader, m_vertexArray);  
     
     gameng::Renderer::EndScene();
@@ -162,17 +199,28 @@ public:
   {
   }
 
+  virtual void OnImguiRender() override
+  {
+    ImGui::Begin("Settings");
+    ImGui::ColorEdit3("Square color", glm::value_ptr(m_squareColor));
+  }
+
 private:
-  std::shared_ptr<gameng::Shader> m_shader;
-  std::shared_ptr<gameng::Shader> m_blueShader;
+  gameng::Ref<gameng::Shader> m_shader;
+  gameng::Ref<gameng::Shader> m_flatColorShader;
   
-  std::shared_ptr<gameng::VertexArray> m_vertexArray;
-  std::shared_ptr<gameng::VertexArray> m_squareVA;
+  gameng::Ref<gameng::VertexArray> m_vertexArray;
+  gameng::Ref<gameng::VertexArray> m_squareVA;
   gameng::OrtographicCamera m_camera;
   glm::vec3 m_cameraPosition;
   float m_cameraMoveSpeed = 5.0f;
   float m_cameraRotation = 0.0f;
   float m_cameraRotationSpeed = 180.0f;
+  float m_squareMoveSpeed = 1.0f;
+  glm::vec3 m_squarePosition;
+
+  glm::vec3 m_squareColor = {0.2f,0.3f,0.8f};
+
 };
 class Sandbox : public gameng::Application{
 public:

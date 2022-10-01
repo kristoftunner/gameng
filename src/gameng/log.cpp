@@ -1,11 +1,12 @@
 #include "gameng/log.hpp"
+#include "gameng/core.hpp"
 
 #include "spdlog/sinks/stdout_color_sinks.h"
 
 namespace gameng
 {
-  std::shared_ptr<spdlog::logger> Logger::s_coreLogger;
-  std::shared_ptr<spdlog::logger> Logger::s_clientLogger;
+  gameng::Ref<spdlog::logger> Logger::s_coreLogger;
+  gameng::Ref<spdlog::logger> Logger::s_clientLogger;
 
   void Logger::Init()
   {
