@@ -22,6 +22,9 @@ Application::Application()
     GAMENG_CORE_ERR("Multiple Application instances!");
   m_window = std::unique_ptr<Window>(Window::Create());
   m_window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
+
+  Renderer::Init();
+
   m_imguiLayer = new ImguiLayer();
   PushOverlay(m_imguiLayer);
 
@@ -55,8 +58,6 @@ void Application::OnEvent(Event& e)
     if(e.Handled())
       break;
   }
-
-  GAMENG_CORE_INFO("{0}",e);
 }
 
 bool Application::OnWindowClosed(WindowCloseEvent& e)

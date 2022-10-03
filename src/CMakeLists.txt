@@ -8,7 +8,7 @@ file(GLOB sources ${CMAKE_CURRENT_SOURCE_DIR}/gameng/*.cpp)
 set(GAMENG_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "some docs")
 
 # get the core sources
-file(GLOB src ${CMAKE_CURRENT_SOURCE_DIR}/gameng/core/${GAMENG_PLATFORM}/*.cpp)
+file(GLOB src ${CMAKE_CURRENT_SOURCE_DIR}/gameng/core/*.cpp)
 list(APPEND sources ${src})
 
 # get the window sources

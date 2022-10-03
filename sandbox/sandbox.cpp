@@ -158,8 +158,9 @@ public:
     )";
     m_shader.reset(gameng::Shader::Create(vertexSrc, fragmentSource));
     m_flatColorShader.reset(gameng::Shader::Create(flatColorVertexSource, flatColorFragmentSource));
-    m_textureShader.reset(gameng::Shader::Create(textureShaderVertexSource, textureShaderFragmentSource));
-    m_texture = gameng::Texture2D::Create("../sandbox/assets/textures/Checkerboard.png");
+    m_textureShader.reset(gameng::Shader::Create("sandbox/assets/shaders/texture.glsl"));
+    m_texture = gameng::Texture2D::Create("sandbox/assets/textures/Checkerboard.png");
+    m_logoTexture = gameng::Texture2D::Create("sandbox/assets/textures/logo.png");
     std::dynamic_pointer_cast<gameng::OpenGLShader>(m_textureShader)->Bind(); 
     std::dynamic_pointer_cast<gameng::OpenGLShader>(m_textureShader)->UploadUniformInt("u_texture", 0); 
   }
@@ -231,6 +232,8 @@ public:
 
     m_texture->Bind(0);
     gameng::Renderer::Submit(m_textureShader, m_squareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.0f)));  
+    m_logoTexture->Bind(0);
+    gameng::Renderer::Submit(m_textureShader, m_squareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.0f)));  
     //gameng::Renderer::Submit(m_shader, m_vertexArray);  
     
     gameng::Renderer::EndScene();
@@ -249,7 +252,7 @@ public:
 private:
   gameng::Ref<gameng::Shader> m_shader;
   gameng::Ref<gameng::Shader> m_flatColorShader, m_textureShader;
-  gameng::Ref<gameng::Texture2D> m_texture;
+  gameng::Ref<gameng::Texture2D> m_texture, m_logoTexture;
   gameng::Ref<gameng::VertexArray> m_vertexArray;
   gameng::Ref<gameng::VertexArray> m_squareVA;
   gameng::OrtographicCamera m_camera;

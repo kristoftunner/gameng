@@ -4,6 +4,17 @@
 #include "gameng/platform/opengl/opengl_shader.hpp"
 namespace gameng
 {
+  Shader* Shader::Create(const std::string& filepath)
+  {
+    switch(Renderer::GetAPI())
+    {
+      case RendererAPI::API::None: GAMENG_CORE_ERR("Renderer API is not supported"); return nullptr;
+      case RendererAPI::API::OpenGL: return new OpenGLShader(filepath);
+      default: GAMENG_CORE_ERR("Unknown renderer API"); return nullptr;
+    }
+    return nullptr;
+  }
+  
   Shader* Shader::Create(const std::string& vertexSource, const std::string& fragmentSource)
   {
     switch(Renderer::GetAPI())
@@ -14,5 +25,6 @@ namespace gameng
     }
     return nullptr;
   }
+
 
 } // namespace gameng

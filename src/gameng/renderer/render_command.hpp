@@ -22,6 +22,11 @@ public:
   {
     s_rendererAPI->DrawIndexed(vertexArray);
   }
+
+  inline static void Init()
+  {
+    s_rendererAPI->Init();
+  }
 private:
   static RendererAPI* s_rendererAPI;
 };

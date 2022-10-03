@@ -25,4 +25,9 @@ namespace gameng
     RenderCommand::DrawIndexed(vertexArray);
   }
 
+  void Renderer::Init()
+  {
+    RenderCommand::Init();
+  }
+
 } // namespace gameng
