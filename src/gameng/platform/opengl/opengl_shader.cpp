@@ -5,6 +5,7 @@
 #include "glad/glad.h"
 #include "glm/gtc/type_ptr.hpp"
 #include <vector>
+#include <array>
 #include <fstream>
 #include <iostream>
 
@@ -26,7 +27,6 @@ std::string OpenGLShader::ReadFile(const std::string& filepath)
 {
   FileSystem& s = FileSystem::GetInstance();
   const std::string path = s.GetAbsolutePath(filepath);
-  GAMENG_CORE_TRACE("current path:{0}, filepath:{1}", std::filesystem::current_path(), path);
   std::string result;
   std::ifstream in;
   in.open(path, std::ios::in);
@@ -42,7 +42,6 @@ std::string OpenGLShader::ReadFile(const std::string& filepath)
   {
     GAMENG_CORE_ERR("Could not open file:'{0}'",filepath);
   }
-  std::cout << result << std::endl;
   return result;
 }
 
@@ -75,8 +74,8 @@ std::unordered_map<GLenum, std::string> OpenGLShader::PreProcess(const std::stri
 void OpenGLShader::Compile(const std::unordered_map<GLenum, std::string>& shaderSources)
 {
   GLuint program = glCreateProgram();
-  std::vector<GLenum> glShaderIds;
-  glShaderIds.reserve(shaderSources.size());
+  std::array<GLenum, 2> glShaderIds;
+  int shaderIdIndex = 0;
   for(auto& kv : shaderSources)
   {
     GLenum type = kv.first;
@@ -109,7 +108,7 @@ void OpenGLShader::Compile(const std::unordered_map<GLenum, std::string>& shader
     }
     
     glAttachShader(program, shader);
-    glShaderIds.push_back(shader);
+    glShaderIds[shaderIdIndex++] = shader;
   }
 
   glLinkProgram(program);
@@ -156,9 +155,17 @@ OpenGLShader::OpenGLShader(const std::string& filepath)
   std::string source = ReadFile(filepath);
   auto shaderSources = PreProcess(source);
   Compile(shaderSources);
+
+  // assets/shaders/texture.glsl
+  auto lastSlash = filepath.find_last_of("/\\");
+  lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
+  auto lastDot = filepath.rfind(".");
+  auto count = lastDot == std::string::npos ? filepath.size() - lastSlash : lastDot - lastSlash;
+  m_name = filepath.substr(lastSlash, count);
 }
 
-OpenGLShader::OpenGLShader(const std::string& vertexSource, const std::string& fragmentSource)
+OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource)
+  : m_name(name)
 {
   std::unordered_map<GLenum, std::string> sources;
   sources[GL_FRAGMENT_SHADER] = fragmentSource;

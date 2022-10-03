@@ -156,13 +156,14 @@ public:
         color = texture(u_texture, v_textCoord);
       }
     )";
-    m_shader.reset(gameng::Shader::Create(vertexSrc, fragmentSource));
-    m_flatColorShader.reset(gameng::Shader::Create(flatColorVertexSource, flatColorFragmentSource));
-    m_textureShader.reset(gameng::Shader::Create("sandbox/assets/shaders/texture.glsl"));
+
+    m_triangleShader = gameng::Shader::Create("vertex", vertexSrc, fragmentSource);
+    m_flatColorShader = gameng::Shader::Create("flatColor", flatColorVertexSource, flatColorFragmentSource);
+    auto textureShader = m_shaderLibrary.Load("sandbox/assets/shaders/texture.glsl");
     m_texture = gameng::Texture2D::Create("sandbox/assets/textures/Checkerboard.png");
     m_logoTexture = gameng::Texture2D::Create("sandbox/assets/textures/logo.png");
-    std::dynamic_pointer_cast<gameng::OpenGLShader>(m_textureShader)->Bind(); 
-    std::dynamic_pointer_cast<gameng::OpenGLShader>(m_textureShader)->UploadUniformInt("u_texture", 0); 
+    std::dynamic_pointer_cast<gameng::OpenGLShader>(m_shaderLibrary.Get("texture"))->Bind(); 
+    std::dynamic_pointer_cast<gameng::OpenGLShader>(m_shaderLibrary.Get("texture"))->UploadUniformInt("u_texture", 0); 
   }
 
   void OnUpdate(gameng::Timestep ts) override
@@ -231,10 +232,9 @@ public:
     }
 
     m_texture->Bind(0);
-    gameng::Renderer::Submit(m_textureShader, m_squareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.0f)));  
+    gameng::Renderer::Submit(m_shaderLibrary.Get("texture"), m_squareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.0f)));  
     m_logoTexture->Bind(0);
-    gameng::Renderer::Submit(m_textureShader, m_squareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.0f)));  
-    //gameng::Renderer::Submit(m_shader, m_vertexArray);  
+    gameng::Renderer::Submit(m_shaderLibrary.Get("texture"), m_squareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.0f)));  
     
     gameng::Renderer::EndScene();
   }
@@ -250,8 +250,10 @@ public:
   }
 
 private:
-  gameng::Ref<gameng::Shader> m_shader;
-  gameng::Ref<gameng::Shader> m_flatColorShader, m_textureShader;
+  gameng::ShaderLibrary m_shaderLibrary;
+
+  gameng::Ref<gameng::Shader> m_triangleShader;
+  gameng::Ref<gameng::Shader> m_flatColorShader;
   gameng::Ref<gameng::Texture2D> m_texture, m_logoTexture;
   gameng::Ref<gameng::VertexArray> m_vertexArray;
   gameng::Ref<gameng::VertexArray> m_squareVA;

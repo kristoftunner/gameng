@@ -11,11 +11,13 @@ class OpenGLShader : public Shader
 {
 public:
   OpenGLShader(const std::string& filepath);
-  OpenGLShader(const std::string& vertexSource, const std::string& fragmentSource);
+  OpenGLShader(const std::string& name, const std::string& vertexSource, const std::string& fragmentSource);
   virtual ~OpenGLShader();
 
   void Bind() const;
   void UnBind() const;
+  
+  virtual const std::string& GetName() const override { return m_name; }
 
   void UploadUniformFloat(const std::string& name, float value);
   void UploadUniformFloat2(const std::string& name, const glm::vec2& values);
@@ -32,6 +34,7 @@ private:
   void Compile(const std::unordered_map<GLenum, std::string>& shaderSource);
 private:
   uint32_t m_rendererId;
+  std::string m_name; 
 };
   
 } // namespace gameng
