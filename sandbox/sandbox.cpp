@@ -36,30 +36,43 @@ public:
     
     unsigned int squareIndices[6] = {0,1,2,2,3,0};
     
-    float squareVertices[5*4] = {
-      // vertex coordinates Texture coordinates
-      -0.5f, -0.5f, 0.0f,   0.0f, 0.0f,
-      0.5f,  -0.5f, 0.0f,   1.0f, 0.0f, 
-      0.5f,  0.5f,  0.0f,   1.0f, 1.0f, 
-      -0.5f, 0.5f,  0.0f,   0.0f, 1.0f 
+    // pyramid vertices
+    float pyramidVertices[] =
+    { //     COORDINATES     /        COLORS              /   TexCoord  //
+    	-0.5f,  0.5f, 0.0f,    0.83f, 0.70f, 0.44f, 1.0f,	  0.0f, 0.0f,
+    	-0.5f, -0.5f, 0.0f,    0.83f, 0.70f, 0.44f, 1.0f,	  5.0f, 0.0f,
+    	 0.5f, -0.5f, 0.0f,    0.83f, 0.70f, 0.44f, 1.0f,	  0.0f, 0.0f,
+    	 0.5f,  0.5f, 0.0f,    0.83f, 0.70f, 0.44f, 1.0f,	  5.0f, 0.0f,
+    	 0.0f,  0.0f, 0.8f,    0.92f, 0.86f, 0.76f, 1.0f,	  2.5f, 5.0f
+    };
+
+    // indices for the pyramid
+    unsigned int indices[] =
+    {
+    	0, 1, 2,
+    	0, 2, 3,
+    	0, 1, 4,
+    	1, 2, 4,
+    	2, 3, 4,
+    	3, 0, 4
     };
 
     // vertex buffer setup for the triangles
-    gameng::Ref<gameng::VertexBuffer> vertexBuffer;
-    vertexBuffer.reset(gameng::VertexBuffer::Create(triangleVerticies, sizeof(triangleVerticies)));
+    gameng::Ref<gameng::VertexBuffer> triangleVB;
+    triangleVB.reset(gameng::VertexBuffer::Create(triangleVerticies, sizeof(triangleVerticies)));
   
     gameng::BufferLayout layout = {
       {gameng::ShaderDataType::Float3, "a_position"},
       {gameng::ShaderDataType::Float4, "a_color"}
     };
 
-    vertexBuffer->SetLayout(layout);
-    m_vertexArray->AddVertexBuffer(vertexBuffer);
+    triangleVB->SetLayout(layout);
+    m_vertexArray->AddVertexBuffer(triangleVB);
 
     // index buffer setup for the triangles
-    gameng::Ref<gameng::IndexBuffer> indexBuffer;
-    indexBuffer.reset(gameng::IndexBuffer::Create(triangleIndices, sizeof(triangleIndices ) / sizeof(uint32_t)));
-    m_vertexArray->SetIndexBuffer(indexBuffer);
+    gameng::Ref<gameng::IndexBuffer> triangleIB;
+    triangleIB.reset(gameng::IndexBuffer::Create(triangleIndices, sizeof(triangleIndices ) / sizeof(uint32_t)));
+    m_vertexArray->SetIndexBuffer(triangleIB);
     m_squareVA.reset(gameng::VertexArray::Create());
   
     // vertex buffer setup for the texture square
@@ -72,10 +85,24 @@ public:
     m_squareVA->AddVertexBuffer(squareVB);
 
     // inxed buffer setup for the texture square
-    gameng::Ref<gameng::IndexBuffer> squareIndexBuffer;
-    squareIndexBuffer.reset(gameng::IndexBuffer::Create(squareIndices, sizeof(squareIndices ) / sizeof(uint32_t)));
-    m_squareVA->SetIndexBuffer(squareIndexBuffer);
+    gameng::Ref<gameng::IndexBuffer> squareIB;
+    squareIB.reset(gameng::IndexBuffer::Create(squareIndices, sizeof(squareIndices ) / sizeof(uint32_t)));
+    m_squareVA->SetIndexBuffer(squareIB);
 
+    // vertex buffer setup for the pyramid 
+    gameng::Ref<gameng::VertexBuffer> pyramidVB;
+    pyramidVB.reset(gameng::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
+    pyramidVB->SetLayout( {
+      {gameng::ShaderDataType::Float3, "a_position"},
+      {gameng::ShaderDataType::Float4, "a_color"}
+      {gameng::ShaderDataType::Float2, "a_textCoord"},
+    });
+    m_pyramidVA->AddVertexBuffer(pyramidVB);
+
+    // inxed buffer setup for the texture square
+    gameng::Ref<gameng::IndexBuffer> pyramidIB;
+    pyramidIB.reset(gameng::IndexBuffer::Create(squareIndices, sizeof(squareIndices ) / sizeof(uint32_t)));
+    m_pyramidVA->SetIndexBuffer(pyramidIB);
     // shader for the colored triangles
     std::string vertexSrc = R"(
       #version 330 core
@@ -258,6 +285,7 @@ private:
   // vertex arrays
   gameng::Ref<gameng::VertexArray> m_vertexArray;
   gameng::Ref<gameng::VertexArray> m_squareVA;
+  gameng::Ref<gameng::VertexArray> m_pyramidVA;
   
   // camera-> this should be dependency injected: strategy pattern in the future
   gameng::OrtographicCamera m_camera;
