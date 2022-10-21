@@ -14,6 +14,8 @@ public:
   {
     // initialize vertex array
     m_vertexArray.reset(gameng::VertexArray::Create());
+    m_squareVA.reset(gameng::VertexArray::Create());
+    m_pyramidVA.reset(gameng::VertexArray::Create());
   
     // triangle vertices for the colored squares
     float triangleVerticies[3*7] = {
@@ -73,7 +75,6 @@ public:
     gameng::Ref<gameng::IndexBuffer> triangleIB;
     triangleIB.reset(gameng::IndexBuffer::Create(triangleIndices, sizeof(triangleIndices ) / sizeof(uint32_t)));
     m_vertexArray->SetIndexBuffer(triangleIB);
-    m_squareVA.reset(gameng::VertexArray::Create());
   
     // vertex buffer setup for the texture square
     gameng::Ref<gameng::VertexBuffer> squareVB;
@@ -94,8 +95,8 @@ public:
     pyramidVB.reset(gameng::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
     pyramidVB->SetLayout( {
       {gameng::ShaderDataType::Float3, "a_position"},
-      {gameng::ShaderDataType::Float4, "a_color"}
-      {gameng::ShaderDataType::Float2, "a_textCoord"},
+      {gameng::ShaderDataType::Float4, "a_color"},
+      {gameng::ShaderDataType::Float2, "a_textCoord"}
     });
     m_pyramidVA->AddVertexBuffer(pyramidVB);
 
