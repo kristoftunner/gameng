@@ -4,6 +4,7 @@
 
 #include "gameng/renderer/render_command.hpp"
 #include "gameng/renderer/ortographic_camera.hpp"
+#include "gameng/renderer/perspective_camera.hpp"
 #include "gameng/renderer/shader.hpp"
 
 namespace gameng

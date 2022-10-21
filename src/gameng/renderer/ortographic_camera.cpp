@@ -5,8 +5,9 @@
 namespace gameng
 {
   OrtographicCamera::OrtographicCamera(float left, float right, float bottom, float top)
-    : m_projectionMatrix(glm::ortho(left, right, bottom, top, -1.0f, 1.0f)), m_viewMatrix(1.0f)
   {
+    m_viewMatrix = glm::mat4(1.0f);
+    m_projectionMatrix = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);  
     m_viewProjMatrix = m_projectionMatrix * m_viewMatrix;
   }
   

@@ -5,8 +5,9 @@ namespace gameng
 {
 
 PerspectiveCamera::PerspectiveCamera(const float aspectRatio, const float fov, const float nearClip, const float farClip)
-  : m_projectionMatrix(glm::perspective(glm::radians(fov), aspectRatio, nearClip, farClip)), m_viewMatrix(1.0f)
 {
+  m_projectionMatrix = glm::perspective(glm::radians(fov), aspectRatio, nearClip, farClip);  
+  m_viewMatrix = glm::mat4(1.0f);
   m_viewProjMatrix = m_projectionMatrix * m_viewMatrix;
 }
 

@@ -40,12 +40,12 @@ public:
     
     // pyramid vertices
     float pyramidVertices[] =
-    { //     COORDINATES     /        COLORS              /   TexCoord  //
-    	-0.5f,  0.5f, 0.0f,    0.83f, 0.70f, 0.44f, 1.0f,	  0.0f, 0.0f,
-    	-0.5f, -0.5f, 0.0f,    0.83f, 0.70f, 0.44f, 1.0f,	  5.0f, 0.0f,
-    	 0.5f, -0.5f, 0.0f,    0.83f, 0.70f, 0.44f, 1.0f,	  0.0f, 0.0f,
-    	 0.5f,  0.5f, 0.0f,    0.83f, 0.70f, 0.44f, 1.0f,	  5.0f, 0.0f,
-    	 0.0f,  0.0f, 0.8f,    0.92f, 0.86f, 0.76f, 1.0f,	  2.5f, 5.0f
+    { //     COORDINATES   Texture coordinates 
+    	-0.5f, 0.0f,  0.5f,  0.0f, 0.0f,
+    	-0.5f, 0.0f, -0.5f,  5.0f, 0.0f,
+    	 0.5f, 0.0f, -0.5f,  0.0f, 0.0f,
+    	 0.5f, 0.0f,  0.5f,  5.0f, 0.0f,
+    	 0.0f, 0.8f,  0.0f,  2.5f, 5.0f
     };
 
     // indices for the pyramid
@@ -104,41 +104,6 @@ public:
     gameng::Ref<gameng::IndexBuffer> pyramidIB;
     pyramidIB.reset(gameng::IndexBuffer::Create(squareIndices, sizeof(squareIndices ) / sizeof(uint32_t)));
     m_pyramidVA->SetIndexBuffer(pyramidIB);
-    // shader for the colored triangles
-    std::string vertexSrc = R"(
-      #version 330 core
-
-      layout(location=0) in vec3 a_position;
-      layout(location=1) in vec4 a_color;
-
-      out vec3 v_position;
-      out vec4 v_color;
-
-      uniform mat4 u_viewProjection;
-      uniform mat4 u_transform;
-
-      void main()
-      {
-        v_position = a_position;
-        v_color = a_color;
-        gl_Position = u_viewProjection * u_transform * vec4(a_position, 1.0);
-      }
-    )";
-
-    std::string fragmentSource = R"(
-      #version 330 core
-
-      layout(location=0) out vec4 color;
-
-      in vec3 v_position;
-      in vec4 v_color;
-
-      void main()
-      {
-        color = vec4(v_position * 0.5 + 0.5, 1.0);
-        color = v_color;
-      }
-    )";
 
     // shaders for the texture square
     std::string flatColorVertexSource = R"(
@@ -174,7 +139,6 @@ public:
     )";
     
     // load and create the shaders for the texture, triangle and coloring
-    m_triangleShader = gameng::Shader::Create("vertex", vertexSrc, fragmentSource);
     m_flatColorShader = gameng::Shader::Create("flatColor", flatColorVertexSource, flatColorFragmentSource);
     auto textureShader = m_shaderLibrary.Load("sandbox/assets/shaders/texture.glsl");
 
@@ -233,8 +197,6 @@ public:
 
     // camera setup
     m_camera.SetPosition(m_cameraPosition);
-    m_camera.SetPosition(m_cameraPosition); 
-    m_camera.SetRotation(m_cameraRotation);
     
     // Renderer initialization
     gameng::RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1});
@@ -242,24 +204,31 @@ public:
     gameng::Renderer::BeginScene(m_camera);
 
     // rendering the flat colored sqaures
-    glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
-    std::dynamic_pointer_cast<gameng::OpenGLShader>(m_flatColorShader)->Bind(); 
-    std::dynamic_pointer_cast<gameng::OpenGLShader>(m_flatColorShader)->UploadUniformFloat3("u_color", m_squareColor); 
-    for(int x = 0; x < 20; x++)
-    {
-      for(int y = 0; y < 5; y++)
-      {
-        glm::vec3 position(x * 0.11f, y* 0.11f, 0.0f);
-        glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * scale;
-        gameng::Renderer::Submit(m_flatColorShader, m_squareVA, transform);  
-      } 
-    }
+    //glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
+    //std::dynamic_pointer_cast<gameng::OpenGLShader>(m_flatColorShader)->Bind(); 
+    //std::dynamic_pointer_cast<gameng::OpenGLShader>(m_flatColorShader)->UploadUniformFloat3("u_color", m_squareColor); 
+    //for(int x = 0; x < 20; x++)
+    //{
+    //  for(int y = 0; y < 5; y++)
+    //  {
+    //    glm::vec3 position(x * 0.11f, y* 0.11f, 0.0f);
+    //    glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * scale;
+    //    gameng::Renderer::Submit(m_flatColorShader, m_squareVA, transform);  
+    //  } 
+    //}
 
     // rendering the textures  
+    //m_texture->Bind(0);
+    //gameng::Renderer::Submit(m_shaderLibrary.Get("texture"), m_squareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.0f)));  
+    //m_logoTexture->Bind(0);
+    //gameng::Renderer::Submit(m_shaderLibrary.Get("texture"), m_squareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.0f)));  
+    
+    // rendering the pyramid
     m_texture->Bind(0);
-    gameng::Renderer::Submit(m_shaderLibrary.Get("texture"), m_squareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.0f)));  
+    gameng::Renderer::Submit(m_shaderLibrary.Get("texture"), m_pyramidVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.0f)));  
     m_logoTexture->Bind(0);
-    gameng::Renderer::Submit(m_shaderLibrary.Get("texture"), m_squareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.0f)));  
+    gameng::Renderer::Submit(m_shaderLibrary.Get("texture"), m_pyramidVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.0f)));  
+    
     
     gameng::Renderer::EndScene();
   }
