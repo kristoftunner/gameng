@@ -20,6 +20,7 @@
 #include "gameng/renderer/texture.hpp"
 
 #include "gameng/renderer/ortographic_camera.hpp"
+#include "gameng/renderer/perspective_camera.hpp"
 
 // core
 #include "gameng/core/timestep.hpp"
