@@ -10,34 +10,15 @@
 class ExampleLayer : public gameng::Layer
 {
 public:
-  ExampleLayer() : Layer("Example"), m_camera(-1.6f, 1.6f, -0.9f, 0.9f), m_cameraPosition(0.0f), m_squarePosition(0.0f)
+  ExampleLayer() : Layer("Example"),  m_cameraPosition({0.0f, -0.5f, -4.0f}), m_squarePosition(0.0f)
   {
+    // initialize camera
+    m_camera.reset(new gameng::PerspectiveCamera(1.0f, 45.0f, 0.1f, 100.0f));
+    //m_camera.reset(new gameng::OrtographicCamera(-1.6f, 1.6f, -0.9f, 0.9f));
+    
     // initialize vertex array
-    m_vertexArray.reset(gameng::VertexArray::Create());
-    m_squareVA.reset(gameng::VertexArray::Create());
     m_pyramidVA.reset(gameng::VertexArray::Create());
   
-    // triangle vertices for the colored squares
-    float triangleVerticies[3*7] = {
-      // vertex coordinates   Colors
-      -0.5f, -0.5f, 0.0f,     1.0f, 0.0f, 1.0f, 1.0f,
-      0.5f,  -0.5f, 0.0f,     0.0f, 0.0f, 1.0f, 1.0f, 
-      0.0f,  0.5f,  0.0f,     1.0f, 0.0f, 0.0f, 1.0f 
-    };
-    
-    unsigned int triangleIndices[3] = {0,1,2};
-
-    // square vertices for the texture
-    float squareVertices[5*4] = {
-      // vertex coordinates Texture coordinates
-      -0.5f, -0.5f, 0.0f,   0.0f, 0.0f,
-      0.5f,  -0.5f, 0.0f,   1.0f, 0.0f, 
-      0.5f,  0.5f,  0.0f,   1.0f, 1.0f, 
-      -0.5f, 0.5f,  0.0f,   0.0f, 1.0f 
-    };
-    
-    unsigned int squareIndices[6] = {0,1,2,2,3,0};
-    
     // pyramid vertices
     float pyramidVertices[] =
     { //     COORDINATES   Texture coordinates 
@@ -49,7 +30,7 @@ public:
     };
 
     // indices for the pyramid
-    unsigned int indices[] =
+    unsigned int pyramidIndices[] =
     {
     	0, 1, 2,
     	0, 2, 3,
@@ -59,95 +40,31 @@ public:
     	3, 0, 4
     };
 
-    // vertex buffer setup for the triangles
-    gameng::Ref<gameng::VertexBuffer> triangleVB;
-    triangleVB.reset(gameng::VertexBuffer::Create(triangleVerticies, sizeof(triangleVerticies)));
-  
-    gameng::BufferLayout layout = {
-      {gameng::ShaderDataType::Float3, "a_position"},
-      {gameng::ShaderDataType::Float4, "a_color"}
-    };
-
-    triangleVB->SetLayout(layout);
-    m_vertexArray->AddVertexBuffer(triangleVB);
-
-    // index buffer setup for the triangles
-    gameng::Ref<gameng::IndexBuffer> triangleIB;
-    triangleIB.reset(gameng::IndexBuffer::Create(triangleIndices, sizeof(triangleIndices ) / sizeof(uint32_t)));
-    m_vertexArray->SetIndexBuffer(triangleIB);
-  
-    // vertex buffer setup for the texture square
-    gameng::Ref<gameng::VertexBuffer> squareVB;
-    squareVB.reset(gameng::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
-    squareVB->SetLayout( {
-      {gameng::ShaderDataType::Float3, "a_position"},
-      {gameng::ShaderDataType::Float2, "a_textCoord"},
-    });
-    m_squareVA->AddVertexBuffer(squareVB);
-
-    // inxed buffer setup for the texture square
-    gameng::Ref<gameng::IndexBuffer> squareIB;
-    squareIB.reset(gameng::IndexBuffer::Create(squareIndices, sizeof(squareIndices ) / sizeof(uint32_t)));
-    m_squareVA->SetIndexBuffer(squareIB);
-
     // vertex buffer setup for the pyramid 
     gameng::Ref<gameng::VertexBuffer> pyramidVB;
-    pyramidVB.reset(gameng::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
+    pyramidVB.reset(gameng::VertexBuffer::Create(pyramidVertices, sizeof(pyramidVertices)));
     pyramidVB->SetLayout( {
       {gameng::ShaderDataType::Float3, "a_position"},
-      {gameng::ShaderDataType::Float4, "a_color"},
       {gameng::ShaderDataType::Float2, "a_textCoord"}
     });
     m_pyramidVA->AddVertexBuffer(pyramidVB);
 
     // inxed buffer setup for the texture square
     gameng::Ref<gameng::IndexBuffer> pyramidIB;
-    pyramidIB.reset(gameng::IndexBuffer::Create(squareIndices, sizeof(squareIndices ) / sizeof(uint32_t)));
+    pyramidIB.reset(gameng::IndexBuffer::Create(pyramidIndices, sizeof(pyramidIndices ) / sizeof(uint32_t)));
     m_pyramidVA->SetIndexBuffer(pyramidIB);
 
-    // shaders for the texture square
-    std::string flatColorVertexSource = R"(
-      #version 330 core
-
-      layout(location=0) in vec3 a_position;
-      layout(location=1) in vec4 a_color;
-
-      uniform mat4 u_viewProjection;
-      uniform mat4 u_transform;
-
-      out vec3 v_position;
-
-      void main()
-      {
-        v_position = a_position;
-        gl_Position = u_viewProjection * u_transform * vec4(a_position, 1.0);
-      }
-    )";
-
-    std::string flatColorFragmentSource = R"(
-      #version 330 core
-
-      layout(location=0) out vec4 color;
-
-      in vec3 v_position;
-      uniform vec3 u_color;
-
-      void main()
-      {
-        color = vec4(u_color, 1.0);
-      }
-    )";
-    
     // load and create the shaders for the texture, triangle and coloring
-    m_flatColorShader = gameng::Shader::Create("flatColor", flatColorVertexSource, flatColorFragmentSource);
     auto textureShader = m_shaderLibrary.Load("sandbox/assets/shaders/texture.glsl");
 
     // load the textures, bind and upload the uniforms for it
-    m_texture = gameng::Texture2D::Create("sandbox/assets/textures/Checkerboard.png");
+    m_texture = gameng::Texture2D::Create("sandbox/assets/textures/brick.png");
     m_logoTexture = gameng::Texture2D::Create("sandbox/assets/textures/logo.png");
+    
     std::dynamic_pointer_cast<gameng::OpenGLShader>(m_shaderLibrary.Get("texture"))->Bind(); 
     std::dynamic_pointer_cast<gameng::OpenGLShader>(m_shaderLibrary.Get("texture"))->UploadUniformInt("u_texture", 0); 
   }
+
 
   void OnUpdate(gameng::Timestep ts) override
   {
@@ -178,25 +95,9 @@ public:
       m_cameraRotation -= m_cameraRotationSpeed* ts;
     } 
 
-    if(gameng::Input::IsKeyPressed(GAMENG_KEY_J))
-    {
-      m_squarePosition.x += m_squareMoveSpeed * ts;
-    } 
-    else if(gameng::Input::IsKeyPressed(GAMENG_KEY_L))
-    {
-      m_squarePosition.x -= m_squareMoveSpeed * ts;
-    } 
-    else if(gameng::Input::IsKeyPressed(GAMENG_KEY_I))
-    {
-      m_squarePosition.y += m_squareMoveSpeed * ts;
-    } 
-    else if(gameng::Input::IsKeyPressed(GAMENG_KEY_K))
-    {
-      m_squarePosition.y -= m_squareMoveSpeed * ts;
-    } 
-
     // camera setup
-    m_camera.SetPosition(m_cameraPosition);
+    m_camera->SetPosition(m_cameraPosition);
+    m_camera->SetRotation(m_cameraRotation);
     
     // Renderer initialization
     gameng::RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1});
@@ -217,7 +118,7 @@ public:
     //  } 
     //}
 
-    // rendering the textures  
+    //// rendering the textures  
     //m_texture->Bind(0);
     //gameng::Renderer::Submit(m_shaderLibrary.Get("texture"), m_squareVA, glm::scale(glm::mat4(1.0f), glm::vec3(1.0f)));  
     //m_logoTexture->Bind(0);
@@ -258,7 +159,7 @@ private:
   gameng::Ref<gameng::VertexArray> m_pyramidVA;
   
   // camera-> this should be dependency injected: strategy pattern in the future
-  gameng::OrtographicCamera m_camera;
+  gameng::Ref<gameng::Camera> m_camera;
   
   // camera motion specific
   glm::vec3 m_cameraPosition;

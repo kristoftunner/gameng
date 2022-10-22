@@ -68,7 +68,7 @@ bool Application::OnWindowClosed(WindowCloseEvent& e)
 
 void Application::Run()
 {
-  WindowResizeEvent e(1200,800);
+  WindowResizeEvent e(800,800);
   GAMENG_CORE_TRACE(e);
   
   while(m_running)

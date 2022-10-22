@@ -19,6 +19,7 @@
 #include "gameng/platform/opengl/opengl_shader.hpp"
 #include "gameng/renderer/texture.hpp"
 
+#include "gameng/renderer/camera.hpp"
 #include "gameng/renderer/ortographic_camera.hpp"
 #include "gameng/renderer/perspective_camera.hpp"
 
