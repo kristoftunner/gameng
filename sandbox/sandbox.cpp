@@ -6,14 +6,15 @@
 #include "imgui.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include "glm/glm.hpp"
 
 class ExampleLayer : public gameng::Layer
 {
 public:
-  ExampleLayer() : Layer("Example"),  m_cameraPosition({0.0f, -0.5f, -4.0f}), m_squarePosition(0.0f)
+  ExampleLayer() : Layer("Example"),  m_cameraPosition({0.0f, 0.0f, 3.0f})
   {
     // initialize camera
-    m_camera.reset(new gameng::PerspectiveCamera(1.0f, 45.0f, 0.1f, 100.0f));
+    m_camera = gameng::PerspectiveCamera(1.0f, 45.0f, 0.1f, 100.0f);
     //m_camera.reset(new gameng::OrtographicCamera(-1.6f, 1.6f, -0.9f, 0.9f));
     
     // initialize vertex array
@@ -68,36 +69,63 @@ public:
 
   void OnUpdate(gameng::Timestep ts) override
   {
-    // key input handling
-    if(gameng::Input::IsKeyPressed(GAMENG_KEY_LEFT))
-    {
-      m_cameraPosition.x += m_cameraMoveSpeed * ts;
-    } 
-    else if(gameng::Input::IsKeyPressed(GAMENG_KEY_RIGHT))
-    {
-      m_cameraPosition.x -= m_cameraMoveSpeed * ts;
-    } 
-    else if(gameng::Input::IsKeyPressed(GAMENG_KEY_UP))
-    {
-      m_cameraPosition.y -= m_cameraMoveSpeed* ts;
-    } 
-    else if(gameng::Input::IsKeyPressed(GAMENG_KEY_DOWN))
-    {
-      m_cameraPosition.y += m_cameraMoveSpeed* ts;
-    }
+    // input handling for perspective camera 
     
+    if(gameng::Input::IsKeyPressed(GAMENG_KEY_W))
+    {
+      m_cameraPosition += m_camera->GetFrontVector() * glm::vec3(m_cameraMoveSpeed * ts);
+    } 
+    else if(gameng::Input::IsKeyPressed(GAMENG_KEY_S))
+    {
+      m_cameraPosition -= m_camera->GetFrontVector() * glm::vec3(m_cameraMoveSpeed * ts);
+    } 
     if(gameng::Input::IsKeyPressed(GAMENG_KEY_A))
     {
-      m_cameraRotation += m_cameraRotationSpeed* ts;
+      m_cameraPosition += m_camera->GetRightVector() * glm::vec3(m_cameraMoveSpeed * ts);
     } 
     else if(gameng::Input::IsKeyPressed(GAMENG_KEY_D))
     {
-      m_cameraRotation -= m_cameraRotationSpeed* ts;
-    } 
+      m_cameraPosition -= m_camera->GetRightVector() * glm::vec3(m_cameraMoveSpeed * ts);
+    }
+
+    // calculating the camera fron from mouse position if the mouse is pressed
+    static constexpr float step = 1.0f;
+    if(gameng::Input::IsKeyPressed(GAMENG_KEY_LEFT))
+    {
+      m_yaw += step;
+      m_yaw = m_yaw < 89.9f ? m_yaw : 89.9f;
+    }
+    else if(gameng::Input::IsKeyPressed(GAMENG_KEY_RIGHT))
+    {
+      m_yaw -= step;
+      m_yaw = m_yaw > -89.9f ? m_yaw : -89.9f;
+    }
+    else if(gameng::Input::IsKeyPressed(GAMENG_KEY_UP))
+    {
+      m_pitch += step;
+      m_pitch = m_pitch < 89.9f ? m_pitch : 89.9f;
+    }
+    else if(gameng::Input::IsKeyPressed(GAMENG_KEY_DOWN))
+    {
+      m_pitch -= step;
+      m_pitch = m_pitch > -89.9f ? m_pitch : -89.9f;
+    }
+
+    GAMENG_CORE_INFO("Pithc:{}° Yaw:{}°", m_pitch, m_yaw);
+    glm::vec3 front;
+    front.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_yaw));
+    front.y = sin(glm::radians(m_pitch));
+    front.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+    glm::vec3 frontVector = glm::normalize(front);
+    // also re-calculate the Right and Up vector
+    glm::vec3 rightVector = glm::normalize(glm::cross(frontVector, m_camera->GetWorldUpVector()));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+    glm::vec3 upVector    = glm::normalize(glm::cross(rightVector, frontVector));
+      
+    m_camera->SetFrontVector(frontVector);
+    m_camera->SetUpVector(upVector);
 
     // camera setup
     m_camera->SetPosition(m_cameraPosition);
-    m_camera->SetRotation(m_cameraRotation);
     
     // Renderer initialization
     gameng::RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1});
@@ -140,8 +168,6 @@ public:
 
   virtual void OnImguiRender() override
   {
-    ImGui::Begin("Settings");
-    ImGui::ColorEdit3("Square color", glm::value_ptr(m_squareColor));
   }
 
 private:
@@ -158,18 +184,15 @@ private:
   gameng::Ref<gameng::VertexArray> m_squareVA;
   gameng::Ref<gameng::VertexArray> m_pyramidVA;
   
-  // camera-> this should be dependency injected: strategy pattern in the future
-  gameng::Ref<gameng::Camera> m_camera;
+  // camera related members
+  gameng::Ref<gameng::PerspectiveCamera> m_camera;
   
   // camera motion specific
   glm::vec3 m_cameraPosition;
+  float m_pitch = 0.0f, m_yaw = -90.0f;
   float m_cameraMoveSpeed = 5.0f;
-  float m_cameraRotation = 0.0f;
-  float m_cameraRotationSpeed = 180.0f;
-  float m_squareMoveSpeed = 1.0f;
-  glm::vec3 m_squarePosition;
-  glm::vec3 m_squareColor = {0.2f,0.3f,0.8f};
-
+  glm::vec2 m_previousMousePosition;
+  bool m_firstClick = true;
 };
 class Sandbox : public gameng::Application{
 public:
