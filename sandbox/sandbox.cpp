@@ -11,7 +11,7 @@
 class ExampleLayer : public gameng::Layer
 {
 public:
-  ExampleLayer() : Layer("Example"),  m_cameraPosition({0.0f, 0.0f, 3.0f})
+  ExampleLayer() : Layer("Example")  
   {
     // initialize camera
     m_camera = gameng::PerspectiveCamera(1.0f, 45.0f, 0.1f, 100.0f);
@@ -69,64 +69,8 @@ public:
 
   void OnUpdate(gameng::Timestep ts) override
   {
-    // input handling for perspective camera 
-    
-    if(gameng::Input::IsKeyPressed(GAMENG_KEY_W))
-    {
-      m_cameraPosition += m_camera->GetFrontVector() * glm::vec3(m_cameraMoveSpeed * ts);
-    } 
-    else if(gameng::Input::IsKeyPressed(GAMENG_KEY_S))
-    {
-      m_cameraPosition -= m_camera->GetFrontVector() * glm::vec3(m_cameraMoveSpeed * ts);
-    } 
-    if(gameng::Input::IsKeyPressed(GAMENG_KEY_A))
-    {
-      m_cameraPosition += m_camera->GetRightVector() * glm::vec3(m_cameraMoveSpeed * ts);
-    } 
-    else if(gameng::Input::IsKeyPressed(GAMENG_KEY_D))
-    {
-      m_cameraPosition -= m_camera->GetRightVector() * glm::vec3(m_cameraMoveSpeed * ts);
-    }
 
-    // calculating the camera fron from mouse position if the mouse is pressed
-    static constexpr float step = 1.0f;
-    if(gameng::Input::IsKeyPressed(GAMENG_KEY_LEFT))
-    {
-      m_yaw += step;
-      m_yaw = m_yaw < 89.9f ? m_yaw : 89.9f;
-    }
-    else if(gameng::Input::IsKeyPressed(GAMENG_KEY_RIGHT))
-    {
-      m_yaw -= step;
-      m_yaw = m_yaw > -89.9f ? m_yaw : -89.9f;
-    }
-    else if(gameng::Input::IsKeyPressed(GAMENG_KEY_UP))
-    {
-      m_pitch += step;
-      m_pitch = m_pitch < 89.9f ? m_pitch : 89.9f;
-    }
-    else if(gameng::Input::IsKeyPressed(GAMENG_KEY_DOWN))
-    {
-      m_pitch -= step;
-      m_pitch = m_pitch > -89.9f ? m_pitch : -89.9f;
-    }
-
-    GAMENG_CORE_INFO("Pithc:{}° Yaw:{}°", m_pitch, m_yaw);
-    glm::vec3 front;
-    front.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_yaw));
-    front.y = sin(glm::radians(m_pitch));
-    front.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
-    glm::vec3 frontVector = glm::normalize(front);
-    // also re-calculate the Right and Up vector
-    glm::vec3 rightVector = glm::normalize(glm::cross(frontVector, m_camera->GetWorldUpVector()));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-    glm::vec3 upVector    = glm::normalize(glm::cross(rightVector, frontVector));
-      
-    m_camera->SetFrontVector(frontVector);
-    m_camera->SetUpVector(upVector);
-
-    // camera setup
-    m_camera->SetPosition(m_cameraPosition);
-    
+    m_camera.OnUpdate(ts); 
     // Renderer initialization
     gameng::RenderCommand::SetClearColor({0.1f, 0.1f, 0.1f, 1});
     gameng::RenderCommand::Clear();
@@ -185,14 +129,7 @@ private:
   gameng::Ref<gameng::VertexArray> m_pyramidVA;
   
   // camera related members
-  gameng::Ref<gameng::PerspectiveCamera> m_camera;
-  
-  // camera motion specific
-  glm::vec3 m_cameraPosition;
-  float m_pitch = 0.0f, m_yaw = -90.0f;
-  float m_cameraMoveSpeed = 5.0f;
-  glm::vec2 m_previousMousePosition;
-  bool m_firstClick = true;
+  gameng::PerspectiveCamera m_camera;
 };
 class Sandbox : public gameng::Application{
 public:

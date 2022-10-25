@@ -8,6 +8,7 @@ namespace gameng
 class PerspectiveCamera : public Camera
 {
 public:
+  PerspectiveCamera() = default;
   PerspectiveCamera(const float aspectRatio, const float fov, const float nearClip, const float farClip);
   
   void OnUpdate(Timestep ts);
@@ -25,6 +26,7 @@ private:
   void MousePan(const glm::vec2 delta);
   void MouseRotate(const glm::vec2& delta);
   void MouseZoom(float delta);
+  float ZoomSpeed() const;
 
   glm::vec3 CalculatePosition() const;
 private:

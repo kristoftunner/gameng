@@ -1,8 +1,8 @@
 #include "perspective_camera.hpp"
 #include "gameng/log.hpp"
 #include "gameng/input.hpp"
-#include "keycodes.hpp"
-#include "mousebutton_codes.hpp"
+#include "gameng/keycodes.hpp"
+#include "gameng/mousebutton_codes.hpp"
 
 #include "glm/ext.hpp"
 #include "glm/glm.hpp"
@@ -55,7 +55,7 @@ glm::vec3 PerspectiveCamera::GetUpVector() const
 
 glm::quat PerspectiveCamera::GetOrientation() const
 {
-  return glm::quat(glm::vec3(m_pitch, m_yaw, 0.0f));
+  return glm::quat(glm::vec3(-m_pitch, -m_yaw, 0.0f));
 }
 
 void PerspectiveCamera::UpdateProjection()
@@ -68,8 +68,9 @@ void PerspectiveCamera::UpdateView()
 {
   m_position = CalculatePosition();
   glm::quat orientation = GetOrientation();
-  m_viewMatrix = glm::translate(glm::mat4(1.0f), m_position) * glm::mat4(orientation);
+  m_viewMatrix = glm::translate(glm::mat4(1.0f), m_position) * glm::toMat4(orientation);
   m_viewMatrix = glm::inverse(m_viewMatrix);
+  m_viewProjMatrix = m_projectionMatrix * m_viewMatrix;
 }
 
 void PerspectiveCamera::MousePan(const glm::vec2 delta)
@@ -79,19 +80,29 @@ void PerspectiveCamera::MousePan(const glm::vec2 delta)
 
 void PerspectiveCamera::MouseRotate(const glm::vec2& delta)
 {
-  m_pitch += delta.x * m_rotationSpeed;
-  m_yaw += delta.y * m_rotationSpeed;
+  m_pitch += delta.y * m_rotationSpeed;
+  m_yaw += delta.x * m_rotationSpeed;
 }
 
 void PerspectiveCamera::MouseZoom(float delta)
 {
-  m_distance -= delta * 0.2;
+  
+  m_distance -= delta * ZoomSpeed();
   // in case we zoomed in too much->fall back to starting position
   if(m_distance < 1.0f)
   {
     m_focalPoint += GetFrontVector();
     m_distance = 1.0f;
   }
+}
+
+float PerspectiveCamera::ZoomSpeed() const
+{
+	float distance = m_distance * 0.2f;
+	distance = std::max(distance, 0.0f);
+	float speed = distance * distance;
+	speed = std::min(speed, 100.0f); // max speed = 100
+	return speed;
 }
 
 glm::vec3 PerspectiveCamera::CalculatePosition() const

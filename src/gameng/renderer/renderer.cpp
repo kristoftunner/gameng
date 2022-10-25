@@ -7,9 +7,9 @@ namespace gameng
 {
   Renderer::SceneData* Renderer::s_sceneData = new Renderer::SceneData;
 
-  void Renderer::BeginScene(Ref<Camera> camera)
+  void Renderer::BeginScene(Camera& camera)
   {
-    s_sceneData->viewProjectionMatrix = camera->GetViewProjectionMatrix();
+    s_sceneData->viewProjectionMatrix = camera.GetViewProjectionMatrix();
   }
 
   void Renderer::EndScene()

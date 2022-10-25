@@ -13,6 +13,9 @@ public:
   const float& GetRotation(){return m_rotation;}
 private:
   void UpdateView() override;
+private:
+  float m_rotation = 0.0f;
+
 };
 
 } // namespace gameng
